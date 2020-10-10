@@ -23,6 +23,17 @@ type Program struct {
 	Statements []Statement
 }
 
+func (p *Program) TokenLiteral() string {
+	return ""
+}
+func (p *Program) String() string {
+	var stmts string
+	for _, stmt := range p.Statements {
+		stmts = fmt.Sprintf("%s\n", stmt.Expr.String())
+	}
+	return stmts
+}
+
 type AddExpression struct {
 	Token     token.Token // Add operator
 	LeftExpr  Expression

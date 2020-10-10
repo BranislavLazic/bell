@@ -3,6 +3,7 @@ package repl
 import (
 	"bufio"
 	"fmt"
+	"github.com/branislavlazic/bell/evaluator"
 	"io"
 
 	"github.com/branislavlazic/bell/lexer"
@@ -21,11 +22,14 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 		line := scanner.Text()
-
 		l := lexer.New(line)
 		p := parser.New(l)
 		program := p.ParseProgram()
-		fmt.Printf("%+v\n", program)
-		fmt.Printf("%+v\n", p.Errors)
+		if len(p.Errors) > 0 {
+			fmt.Printf("%+v\n", p.Errors)
+		} else {
+			evalRes := evaluator.Eval(program)
+			fmt.Printf("%+v\n", evalRes)
+		}
 	}
 }
