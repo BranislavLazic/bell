@@ -100,7 +100,9 @@ func evalNegateExpression(value object.Object) object.Object {
 		v := value.(*object.Integer).Value
 		return &object.Integer{Value: -1 * v}
 	} else {
-		return &object.Null{}
+		return &object.RuntimeError{
+			Error: fmt.Sprintf("Negation of arithmetic expressions is not applicable for %s type.", value.Type()),
+		}
 	}
 }
 
@@ -109,7 +111,9 @@ func evalNotExpression(value object.Object) object.Object {
 		v := value.(*object.Boolean).Value
 		return &object.Boolean{Value: !v}
 	} else {
-		return &object.Null{}
+		return &object.RuntimeError{
+			Error: fmt.Sprintf("Negation of logical expressions is not applicable for %s types.", value.Type()),
+		}
 	}
 }
 
