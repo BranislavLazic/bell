@@ -6,23 +6,35 @@ const (
 	StartExpression = "START_EXPRESSION"
 	EndExpression   = "END_EXPRESSION"
 	INT             = "INT"
+	BOOL            = "BOOL"
+	EOF             = "EOF"
+	EOL             = "EOL"
+	ILLEGAL         = "ILLEGAL"
 	// Operators
-	ADD      = "ADD"
-	SUBTRACT = "SUBTRACT"
-	MULTIPLY = "MULTIPLY"
-	DIVIDE   = "DIVIDE"
-	EOF      = "EOF"
-	EOL      = "EOL"
-	ILLEGAL  = "ILLEGAL"
+	ADD              = "ADD"
+	SUBTRACT         = "SUBTRACT"
+	MULTIPLY         = "MULTIPLY"
+	DIVIDE           = "DIVIDE"
+	EQUAL            = "EQUAL"
+	NOT              = "NOT"
+	AND              = "AND"
+	OR               = "OR"
+	GreaterThen      = "GREATER_THEN"
+	LessThen         = "LESS_THEN"
+	GreaterThanEqual = "GREATER_THAN_EQUAL"
+	LessThanEqual    = "LESS_THAN_EQUAL"
 )
 
-var instructions = map[string]TokType{
-	"(": StartExpression,
-	")": EndExpression,
+var keywords = map[string]TokType{
+	"true":  BOOL,
+	"false": BOOL,
+	"and":   AND,
+	"or":    OR,
+	"not":   NOT,
 }
 
-func LookupInstruction(instruction string) TokType {
-	if tok, ok := instructions[instruction]; ok {
+func LookupKeyword(instruction string) TokType {
+	if tok, ok := keywords[instruction]; ok {
 		return tok
 	}
 	return ILLEGAL

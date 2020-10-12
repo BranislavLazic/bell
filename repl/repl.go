@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/branislavlazic/bell/evaluator"
 	"io"
+	"os"
 
 	"github.com/branislavlazic/bell/lexer"
 	"github.com/branislavlazic/bell/parser"
@@ -26,10 +27,16 @@ func Start(in io.Reader, out io.Writer) {
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors) > 0 {
-			fmt.Printf("%+v\n", p.Errors)
+			parserErrs := fmt.Sprintf("%+v\n", p.Errors)
+			_, _ = out.Write([]byte(parserErrs))
 		} else {
 			evalRes := evaluator.Eval(program)
-			fmt.Printf("%+v\n", evalRes)
+			evalResult := fmt.Sprintf("%+v\n", evalRes)
+			_, err := out.Write([]byte(evalResult))
+			if err != nil {
+				fmt.Println("Failed to write a result.")
+				os.Exit(1)
+			}
 		}
 	}
 }

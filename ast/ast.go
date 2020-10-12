@@ -11,27 +11,23 @@ type Node interface {
 	String() string
 }
 
-type Statement struct {
-	Expr Expression
-}
-
 type Expression interface {
 	Node
 }
 
 type Program struct {
-	Statements []Statement
+	Expressions []Expression
 }
 
 func (p *Program) TokenLiteral() string {
 	return ""
 }
 func (p *Program) String() string {
-	var stmts string
-	for _, stmt := range p.Statements {
-		stmts = fmt.Sprintf("%s\n", stmt.Expr.String())
+	var exprs string
+	for _, expr := range p.Expressions {
+		exprs = fmt.Sprintf("%s\n", expr.String())
 	}
-	return stmts
+	return exprs
 }
 
 type AddExpression struct {
@@ -86,6 +82,45 @@ func (de *DivideExpression) String() string {
 	return fmt.Sprintf("Divide(%s %s)", de.LeftExpr.String(), de.RightExpr.String())
 }
 
+type EqualExpression struct {
+	Token     token.Token // Equal operator
+	LeftExpr  Expression
+	RightExpr Expression
+}
+
+func (eq *EqualExpression) TokenLiteral() string {
+	return eq.Token.Literal
+}
+func (eq *EqualExpression) String() string {
+	return fmt.Sprintf("Equal(%s %s)", eq.LeftExpr.String(), eq.RightExpr.String())
+}
+
+type AndExpression struct {
+	Token     token.Token // And operator
+	LeftExpr  Expression
+	RightExpr Expression
+}
+
+func (ae *AndExpression) TokenLiteral() string {
+	return ae.Token.Literal
+}
+func (ae *AndExpression) String() string {
+	return fmt.Sprintf("And(%s %s)", ae.LeftExpr.String(), ae.RightExpr.String())
+}
+
+type OrExpression struct {
+	Token     token.Token // Pr operator
+	LeftExpr  Expression
+	RightExpr Expression
+}
+
+func (oe *OrExpression) TokenLiteral() string {
+	return oe.Token.Literal
+}
+func (oe *OrExpression) String() string {
+	return fmt.Sprintf("Or(%s %s)", oe.LeftExpr.String(), oe.RightExpr.String())
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
@@ -98,6 +133,18 @@ func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
 
+type BooleanLiteral struct {
+	Token token.Token
+	Value bool
+}
+
+func (bl *BooleanLiteral) TokenLiteral() string {
+	return bl.Token.Literal
+}
+func (bl *BooleanLiteral) String() string {
+	return bl.Token.Literal
+}
+
 type NegativeValueExpression struct {
 	Token token.Token // Subtract operator
 	Expr  Expression
@@ -108,6 +155,18 @@ func (ae *NegativeValueExpression) TokenLiteral() string {
 }
 func (ae *NegativeValueExpression) String() string {
 	return fmt.Sprintf("NegativeValue(%s)", ae.Expr.String())
+}
+
+type NotExpression struct {
+	Token token.Token // Not operator
+	Expr  Expression
+}
+
+func (ne *NotExpression) TokenLiteral() string {
+	return ne.Token.Literal
+}
+func (ne *NotExpression) String() string {
+	return fmt.Sprintf("Not(%s)", ne.Expr.String())
 }
 
 type NoopExpression struct{}
