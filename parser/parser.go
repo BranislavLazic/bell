@@ -75,8 +75,6 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseBoolLiteral()
 	case token.INT:
 		expr = p.parseIntLiteral()
-	case token.ILLEGAL:
-		p.checkIllegal()
 	case token.StartExpression:
 		p.parensCount++
 		expr = p.parseNextExpression()
@@ -166,13 +164,6 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		p.Errors = append(p.Errors, "Failed to parse a value to bool.")
 	}
 	return &ast.BooleanLiteral{Token: p.curToken, Value: value}
-}
-
-func (p *Parser) checkIllegal() {
-	switch p.peekToken.Literal {
-	case token.IdentTooLong:
-		p.Errors = append(p.Errors, "Identifier might be too long.")
-	}
 }
 
 func (p *Parser) nextToken() {
