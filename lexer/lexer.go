@@ -87,10 +87,14 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+// Identifier is an any sequence of characters and
+// it must begins with a letter
 func (l *Lexer) readIdentifier() string {
 	position := l.position
-	for isLetter(l.ch) {
-		l.readChar()
+	if isLetter(l.ch) {
+		for !isWhitespace(l.ch) && l.ch != ')' && l.ch != 0 {
+			l.readChar()
+		}
 	}
 	return l.input[position:l.position]
 }
@@ -99,6 +103,10 @@ func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' {
 		l.readChar()
 	}
+}
+
+func isWhitespace(ch byte) bool {
+	return ch == ' ' || ch == '\t'
 }
 
 func isLetter(ch byte) bool {

@@ -20,6 +20,8 @@ func Eval(node ast.Node) object.Object {
 		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
 	case *ast.EqualExpression:
 		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+	case *ast.NotEqualExpression:
+		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
 	case *ast.AndExpression:
 		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
 	case *ast.OrExpression:
@@ -77,6 +79,8 @@ func evalArithmeticOperation(exprType ast.Node, left *object.Integer, right *obj
 		return &object.Integer{Value: left.Value / right.Value}
 	case *ast.EqualExpression:
 		return &object.Boolean{Value: left.Value == right.Value}
+	case *ast.NotEqualExpression:
+		return &object.Boolean{Value: left.Value != right.Value}
 	default:
 		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for INTEGER types.", exprType.String())}
 	}
@@ -90,6 +94,8 @@ func evalLogicalOperation(exprType ast.Node, left *object.Boolean, right *object
 		return &object.Boolean{Value: left.Value || right.Value}
 	case *ast.EqualExpression:
 		return &object.Boolean{Value: left.Value == right.Value}
+	case *ast.NotEqualExpression:
+		return &object.Boolean{Value: left.Value != right.Value}
 	default:
 		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for BOOLEAN types.", exprType.String())}
 	}

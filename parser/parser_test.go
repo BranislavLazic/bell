@@ -98,13 +98,14 @@ func TestParser_LogicalOperations(t *testing.T) {
 	input := `(not false)
 	(not true)
 	(and true false)
-	(or true false)`
+	(or true false)
+	(not= true false)`
 	l := lexer.New(input)
 	p := New(l)
 	prog := p.ParseProgram()
 
-	if len(prog.Expressions) != 4 {
-		t.Fatalf("test - wrong number of expressions. expected=%d, got=%d", 2, len(prog.Expressions))
+	if len(prog.Expressions) != 5 {
+		t.Fatalf("test - wrong number of expressions. expected=%d, got=%d", 5, len(prog.Expressions))
 	}
 
 	if len(p.Errors) != 0 {
@@ -143,5 +144,15 @@ func TestParser_LogicalOperations(t *testing.T) {
 	}
 	if orExpr.RightExpr.(*ast.BooleanLiteral).Value != false {
 		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, orExpr.LeftExpr.(*ast.BooleanLiteral).Value)
+	}
+	notEq := prog.Expressions[4].(*ast.NotEqualExpression)
+	if notEq.Token.Type != token.NotEqual {
+		t.Fatalf("test - wrong token type for not expression. expected=%s, got=%s", token.NotEqual, orExpr.Token.Type)
+	}
+	if notEq.LeftExpr.(*ast.BooleanLiteral).Value != true {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, notEq.LeftExpr.(*ast.BooleanLiteral).Value)
+	}
+	if orExpr.RightExpr.(*ast.BooleanLiteral).Value != false {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, notEq.LeftExpr.(*ast.BooleanLiteral).Value)
 	}
 }

@@ -10,12 +10,14 @@ const (
 	EOF             = "EOF"
 	EOL             = "EOL"
 	ILLEGAL         = "ILLEGAL"
+	IdentTooLong    = "IDENT_TOO_LONG"
 	// Operators
 	ADD              = "ADD"
 	SUBTRACT         = "SUBTRACT"
 	MULTIPLY         = "MULTIPLY"
 	DIVIDE           = "DIVIDE"
 	EQUAL            = "EQUAL"
+	NotEqual         = "NOT_EQUAL"
 	NOT              = "NOT"
 	AND              = "AND"
 	OR               = "OR"
@@ -31,6 +33,7 @@ var keywords = map[string]TokType{
 	"and":   AND,
 	"or":    OR,
 	"not":   NOT,
+	"not=":  NotEqual,
 }
 
 func LookupKeyword(instruction string) TokType {

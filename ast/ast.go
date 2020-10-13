@@ -88,11 +88,24 @@ type EqualExpression struct {
 	RightExpr Expression
 }
 
-func (eq *EqualExpression) TokenLiteral() string {
-	return eq.Token.Literal
+func (ne *EqualExpression) TokenLiteral() string {
+	return ne.Token.Literal
 }
-func (eq *EqualExpression) String() string {
-	return fmt.Sprintf("Equal(%s %s)", eq.LeftExpr.String(), eq.RightExpr.String())
+func (ne *EqualExpression) String() string {
+	return fmt.Sprintf("Equal(%s %s)", ne.LeftExpr.String(), ne.RightExpr.String())
+}
+
+type NotEqualExpression struct {
+	Token     token.Token // Not equal operator
+	LeftExpr  Expression
+	RightExpr Expression
+}
+
+func (nee *NotEqualExpression) TokenLiteral() string {
+	return nee.Token.Literal
+}
+func (nee *NotEqualExpression) String() string {
+	return fmt.Sprintf("NotEqual(%s %s)", nee.LeftExpr.String(), nee.RightExpr.String())
 }
 
 type AndExpression struct {

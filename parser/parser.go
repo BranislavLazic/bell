@@ -63,6 +63,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseArithmeticExpression()
 	case token.EQUAL:
 		expr = p.parseArithmeticExpression()
+	case token.NotEqual:
+		expr = p.parseArithmeticExpression()
 	case token.AND:
 		expr = p.parseLogicalExpression()
 	case token.OR:
@@ -73,6 +75,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseBoolLiteral()
 	case token.INT:
 		expr = p.parseIntLiteral()
+	case token.ILLEGAL:
+		p.checkIllegal()
 	case token.StartExpression:
 		p.parensCount++
 		expr = p.parseNextExpression()
@@ -103,6 +107,10 @@ func (p *Parser) parseArithmeticExpression() ast.Expression {
 	if tok.Type == token.SUBTRACT && leftExpr != nil && rightExpr == nil {
 		return &ast.NegativeValueExpression{Token: tok, Expr: leftExpr}
 	}
+	if rightExpr == nil {
+		p.Errors = append(p.Errors, "Missing right expression for an arithmetic operation.")
+		return nil
+	}
 	var expr ast.Expression
 	switch tok.Type {
 	case token.ADD:
@@ -115,6 +123,8 @@ func (p *Parser) parseArithmeticExpression() ast.Expression {
 		expr = &ast.DivideExpression{Token: tok, LeftExpr: leftExpr, RightExpr: rightExpr}
 	case token.EQUAL:
 		expr = &ast.EqualExpression{Token: tok, LeftExpr: leftExpr, RightExpr: rightExpr}
+	case token.NotEqual:
+		expr = &ast.NotEqualExpression{Token: tok, LeftExpr: leftExpr, RightExpr: rightExpr}
 	}
 	return expr
 }
@@ -125,6 +135,10 @@ func (p *Parser) parseLogicalExpression() ast.Expression {
 	rightExpr := p.parseExpression()
 	if tok.Type == token.NOT && leftExpr != nil && rightExpr == nil {
 		return &ast.NotExpression{Token: tok, Expr: leftExpr}
+	}
+	if rightExpr == nil {
+		p.Errors = append(p.Errors, "Missing right expression for a boolean operation.")
+		return nil
 	}
 	var expr ast.Expression
 	switch tok.Type {
@@ -152,6 +166,13 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		p.Errors = append(p.Errors, "Failed to parse a value to bool.")
 	}
 	return &ast.BooleanLiteral{Token: p.curToken, Value: value}
+}
+
+func (p *Parser) checkIllegal() {
+	switch p.peekToken.Literal {
+	case token.IdentTooLong:
+		p.Errors = append(p.Errors, "Identifier might be too long.")
+	}
 }
 
 func (p *Parser) nextToken() {
