@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/branislavlazic/bell/token"
 )
@@ -31,107 +32,99 @@ func (p *Program) String() string {
 }
 
 type AddExpression struct {
-	Token     token.Token // Add operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Add operator
+	Exprs []Expression
 }
 
 func (ae *AddExpression) TokenLiteral() string {
 	return ae.Token.Literal
 }
 func (ae *AddExpression) String() string {
-	return fmt.Sprintf("Add(%s, %s)", ae.LeftExpr.String(), ae.RightExpr.String())
+	return fmt.Sprintf("(+ %s)", concatExprsAsString(ae.Exprs))
 }
 
 type SubtractExpression struct {
-	Token     token.Token // Subtract operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Subtract operator
+	Exprs []Expression
 }
 
 func (se *SubtractExpression) TokenLiteral() string {
 	return se.Token.Literal
 }
 func (se *SubtractExpression) String() string {
-	return fmt.Sprintf("Subtract(%s, %s)", se.LeftExpr.String(), se.RightExpr.String())
+	return fmt.Sprintf("(- %s)", concatExprsAsString(se.Exprs))
 }
 
 type MultiplyExpression struct {
-	Token     token.Token // Multiply operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Multiply operator
+	Exprs []Expression
 }
 
 func (me *MultiplyExpression) TokenLiteral() string {
 	return me.Token.Literal
 }
 func (me *MultiplyExpression) String() string {
-	return fmt.Sprintf("Multiply(%s, %s)", me.LeftExpr.String(), me.RightExpr.String())
+	return fmt.Sprintf("(* %s)", concatExprsAsString(me.Exprs))
 }
 
 type DivideExpression struct {
-	Token     token.Token // Divide operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Divide operator
+	Exprs []Expression
 }
 
 func (de *DivideExpression) TokenLiteral() string {
 	return de.Token.Literal
 }
 func (de *DivideExpression) String() string {
-	return fmt.Sprintf("Divide(%s %s)", de.LeftExpr.String(), de.RightExpr.String())
+	return fmt.Sprintf("(/ %s)", concatExprsAsString(de.Exprs))
 }
 
 type EqualExpression struct {
-	Token     token.Token // Equal operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Equal operator
+	Exprs []Expression
 }
 
-func (ne *EqualExpression) TokenLiteral() string {
-	return ne.Token.Literal
+func (ee *EqualExpression) TokenLiteral() string {
+	return ee.Token.Literal
 }
-func (ne *EqualExpression) String() string {
-	return fmt.Sprintf("Equal(%s %s)", ne.LeftExpr.String(), ne.RightExpr.String())
+func (ee *EqualExpression) String() string {
+	return fmt.Sprintf("(= %s)", concatExprsAsString(ee.Exprs))
 }
 
 type NotEqualExpression struct {
-	Token     token.Token // Not equal operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Not equal operator
+	Exprs []Expression
 }
 
 func (nee *NotEqualExpression) TokenLiteral() string {
 	return nee.Token.Literal
 }
 func (nee *NotEqualExpression) String() string {
-	return fmt.Sprintf("NotEqual(%s %s)", nee.LeftExpr.String(), nee.RightExpr.String())
+	return fmt.Sprintf("(not= %s)", concatExprsAsString(nee.Exprs))
 }
 
 type AndExpression struct {
-	Token     token.Token // And operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // And operator
+	Exprs []Expression
 }
 
 func (ae *AndExpression) TokenLiteral() string {
 	return ae.Token.Literal
 }
 func (ae *AndExpression) String() string {
-	return fmt.Sprintf("And(%s %s)", ae.LeftExpr.String(), ae.RightExpr.String())
+	return fmt.Sprintf("(and %s)", concatExprsAsString(ae.Exprs))
 }
 
 type OrExpression struct {
-	Token     token.Token // Pr operator
-	LeftExpr  Expression
-	RightExpr Expression
+	Token token.Token // Pr operator
+	Exprs []Expression
 }
 
 func (oe *OrExpression) TokenLiteral() string {
 	return oe.Token.Literal
 }
 func (oe *OrExpression) String() string {
-	return fmt.Sprintf("Or(%s %s)", oe.LeftExpr.String(), oe.RightExpr.String())
+	return fmt.Sprintf("(or %s)", concatExprsAsString(oe.Exprs))
 }
 
 type IntegerLiteral struct {
@@ -182,11 +175,10 @@ func (ne *NotExpression) String() string {
 	return fmt.Sprintf("Not(%s)", ne.Expr.String())
 }
 
-type NoopExpression struct{}
-
-func (ne *NoopExpression) TokenLiteral() string {
-	return "NOOP"
-}
-func (ne *NoopExpression) String() string {
-	return "NOOP"
+func concatExprsAsString(exprs []Expression) string {
+	var exprsAsStrArr []string
+	for _, expr := range exprs {
+		exprsAsStrArr = append(exprsAsStrArr, expr.String())
+	}
+	return strings.Join(exprsAsStrArr, " ")
 }

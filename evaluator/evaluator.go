@@ -11,21 +11,21 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Program:
 		return evalExpressions(node.Expressions)
 	case *ast.AddExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.SubtractExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.MultiplyExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.DivideExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.EqualExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalEqualForAll(node, node.Exprs)
 	case *ast.NotEqualExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalNotEqualForAll(node, node.Exprs)
 	case *ast.AndExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.OrExpression:
-		return evalBinaryExpression(node, node.LeftExpr, node.RightExpr)
+		return evalExpression(node, node.Exprs)
 	case *ast.NegativeValueExpression:
 		value := Eval(node.Expr)
 		return evalNegateExpression(value)
@@ -41,27 +41,31 @@ func Eval(node ast.Node) object.Object {
 	}
 }
 
-func evalBinaryExpression(node ast.Node, leftExpr ast.Expression, rightExpr ast.Expression) object.Object {
-	left := Eval(leftExpr)
-	right := Eval(rightExpr)
-	return evalExpression(node, left, right)
-}
-
-func evalExpression(exprType ast.Node, left object.Object, right object.Object) object.Object {
-	switch {
-	case left.Type() == object.IntegerObj && right.Type() == object.IntegerObj:
-		leftVal := left.(*object.Integer)
-		rightVal := right.(*object.Integer)
-		return evalArithmeticOperation(exprType, leftVal, rightVal)
-	case left.Type() == object.BooleanObj && right.Type() == object.BooleanObj:
-		leftVal := left.(*object.Boolean)
-		rightVal := right.(*object.Boolean)
-		return evalLogicalOperation(exprType, leftVal, rightVal)
-	default:
-		return &object.RuntimeError{
-			Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s", exprType.String(), left.Type(), right.Type()),
+func evalExpression(exprType ast.Node, exprs []ast.Expression) object.Object {
+	var accumResult object.Object
+	for _, expr := range exprs {
+		evalExpr := Eval(expr)
+		// Declare first value as an accumulator
+		if accumResult == nil {
+			accumResult = evalExpr
+		} else {
+			switch {
+			case evalExpr.Type() == object.IntegerObj && accumResult.Type() == object.IntegerObj:
+				nextValue := evalExpr.(*object.Integer)
+				// Evaluate operation by passing current accumulated value and next value
+				accumResult = evalArithmeticOperation(exprType, accumResult.(*object.Integer), nextValue)
+			case evalExpr.Type() == object.BooleanObj && accumResult.Type() == object.BooleanObj:
+				nextValue := evalExpr.(*object.Boolean)
+				accumResult = evalLogicalOperation(exprType, accumResult.(*object.Boolean), nextValue)
+			default:
+				return &object.RuntimeError{
+					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
+						exprType.String(), accumResult.Type(), evalExpr.Type()),
+				}
+			}
 		}
 	}
+	return accumResult
 }
 
 func evalArithmeticOperation(exprType ast.Node, left *object.Integer, right *object.Integer) object.Object {
@@ -98,6 +102,43 @@ func evalLogicalOperation(exprType ast.Node, left *object.Boolean, right *object
 		return &object.Boolean{Value: left.Value != right.Value}
 	default:
 		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for BOOLEAN types.", exprType.String())}
+	}
+}
+
+func evalEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object {
+	var accumResult object.Object
+	for _, expr := range exprs {
+		evalExpr := Eval(expr)
+		if accumResult == nil {
+			accumResult = evalExpr
+		} else {
+			switch {
+			case evalExpr.Type() == object.IntegerObj && accumResult.Type() == object.IntegerObj:
+				if accumResult.(*object.Integer).Value != evalExpr.(*object.Integer).Value {
+					return &object.Boolean{Value: false}
+				}
+			case evalExpr.Type() == object.BooleanObj && accumResult.Type() == object.BooleanObj:
+				if accumResult.(*object.Boolean).Value != evalExpr.(*object.Boolean).Value {
+					return &object.Boolean{Value: false}
+				}
+			default:
+				return &object.RuntimeError{
+					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
+						exprType.String(), accumResult.Type(), evalExpr.Type()),
+				}
+			}
+		}
+	}
+	return &object.Boolean{Value: true}
+}
+
+func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object {
+	res := evalEqualForAll(exprType, exprs)
+	switch res.(type) {
+	case *object.Boolean:
+		return &object.Boolean{Value: !res.(*object.Boolean).Value}
+	default:
+		return res
 	}
 }
 

@@ -75,22 +75,22 @@ func TestParser_ParseTwoPlusExpression(t *testing.T) {
 	if plusExpr.Token.Type != token.ADD {
 		t.Fatalf("test - wrong token type for plus expression. expected=%s, got=%s", "+", plusExpr.Token.Type)
 	}
-	if plusExpr.LeftExpr.(*ast.IntegerLiteral).Value != 2 {
-		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 2, plusExpr.LeftExpr.(*ast.IntegerLiteral).Value)
+	if plusExpr.Exprs[0].(*ast.IntegerLiteral).Value != 2 {
+		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 2, plusExpr.Exprs[0].(*ast.IntegerLiteral).Value)
 	}
-	if plusExpr.RightExpr.(*ast.IntegerLiteral).Value != 3 {
-		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 3, plusExpr.RightExpr.(*ast.IntegerLiteral).Value)
+	if plusExpr.Exprs[1].(*ast.IntegerLiteral).Value != 3 {
+		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 3, plusExpr.Exprs[1].(*ast.IntegerLiteral).Value)
 	}
 
 	minusExpr := prog.Expressions[1].(*ast.SubtractExpression)
 	if minusExpr.Token.Type != token.SUBTRACT {
 		t.Fatalf("test - wrong token type for minus expression. expected=%s, got=%s", "+", minusExpr.Token.Type)
 	}
-	if minusExpr.LeftExpr.(*ast.IntegerLiteral).Value != 7 {
-		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 7, minusExpr.LeftExpr.(*ast.IntegerLiteral).Value)
+	if minusExpr.Exprs[0].(*ast.IntegerLiteral).Value != 7 {
+		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 7, minusExpr.Exprs[0].(*ast.IntegerLiteral).Value)
 	}
-	if minusExpr.RightExpr.(*ast.IntegerLiteral).Value != 9 {
-		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 9, minusExpr.RightExpr.(*ast.IntegerLiteral).Value)
+	if minusExpr.Exprs[1].(*ast.IntegerLiteral).Value != 9 {
+		t.Fatalf("test - wrong value for integer literal. expected=%d, got=%d", 9, minusExpr.Exprs[1].(*ast.IntegerLiteral).Value)
 	}
 }
 
@@ -129,30 +129,30 @@ func TestParser_LogicalOperations(t *testing.T) {
 	if andExpr.Token.Type != token.AND {
 		t.Fatalf("test - wrong token type for and expression. expected=%s, got=%s", token.AND, andExpr.Token.Type)
 	}
-	if andExpr.LeftExpr.(*ast.BooleanLiteral).Value != true {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, andExpr.LeftExpr.(*ast.BooleanLiteral).Value)
+	if andExpr.Exprs[0].(*ast.BooleanLiteral).Value != true {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, andExpr.Exprs[0].(*ast.BooleanLiteral).Value)
 	}
-	if andExpr.RightExpr.(*ast.BooleanLiteral).Value != false {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, andExpr.LeftExpr.(*ast.BooleanLiteral).Value)
+	if andExpr.Exprs[1].(*ast.BooleanLiteral).Value != false {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, andExpr.Exprs[1].(*ast.BooleanLiteral).Value)
 	}
 	orExpr := prog.Expressions[3].(*ast.OrExpression)
 	if orExpr.Token.Type != token.OR {
 		t.Fatalf("test - wrong token type for and expression. expected=%s, got=%s", token.OR, orExpr.Token.Type)
 	}
-	if orExpr.LeftExpr.(*ast.BooleanLiteral).Value != true {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, orExpr.LeftExpr.(*ast.BooleanLiteral).Value)
+	if orExpr.Exprs[0].(*ast.BooleanLiteral).Value != true {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, orExpr.Exprs[0].(*ast.BooleanLiteral).Value)
 	}
-	if orExpr.RightExpr.(*ast.BooleanLiteral).Value != false {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, orExpr.LeftExpr.(*ast.BooleanLiteral).Value)
+	if orExpr.Exprs[1].(*ast.BooleanLiteral).Value != false {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, orExpr.Exprs[1].(*ast.BooleanLiteral).Value)
 	}
 	notEq := prog.Expressions[4].(*ast.NotEqualExpression)
 	if notEq.Token.Type != token.NotEqual {
 		t.Fatalf("test - wrong token type for not expression. expected=%s, got=%s", token.NotEqual, orExpr.Token.Type)
 	}
-	if notEq.LeftExpr.(*ast.BooleanLiteral).Value != true {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, notEq.LeftExpr.(*ast.BooleanLiteral).Value)
+	if notEq.Exprs[0].(*ast.BooleanLiteral).Value != true {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", true, notEq.Exprs[0].(*ast.BooleanLiteral).Value)
 	}
-	if orExpr.RightExpr.(*ast.BooleanLiteral).Value != false {
-		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, notEq.LeftExpr.(*ast.BooleanLiteral).Value)
+	if orExpr.Exprs[1].(*ast.BooleanLiteral).Value != false {
+		t.Fatalf("test - wrong value for boolean literal. expected=%t, got=%t", false, notEq.Exprs[1].(*ast.BooleanLiteral).Value)
 	}
 }
