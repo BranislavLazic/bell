@@ -116,7 +116,7 @@ func (ae *AndExpression) String() string {
 }
 
 type OrExpression struct {
-	Token token.Token // Pr operator
+	Token token.Token // Or operator
 	Exprs []Expression
 }
 
@@ -160,7 +160,7 @@ func (ae *NegativeValueExpression) TokenLiteral() string {
 	return ae.Token.Literal
 }
 func (ae *NegativeValueExpression) String() string {
-	return fmt.Sprintf("NegativeValue(%s)", ae.Expr.String())
+	return fmt.Sprintf("(- %s)", ae.Expr.String())
 }
 
 type NotExpression struct {
@@ -172,7 +172,55 @@ func (ne *NotExpression) TokenLiteral() string {
 	return ne.Token.Literal
 }
 func (ne *NotExpression) String() string {
-	return fmt.Sprintf("Not(%s)", ne.Expr.String())
+	return fmt.Sprintf("(not %s)", ne.Expr.String())
+}
+
+type GreaterThanExpression struct {
+	Token token.Token // Greater than operator
+	Exprs []Expression
+}
+
+func (gte *GreaterThanExpression) TokenLiteral() string {
+	return gte.Token.Literal
+}
+func (gte *GreaterThanExpression) String() string {
+	return fmt.Sprintf("(> %s)", concatExprsAsString(gte.Exprs))
+}
+
+type LessThanExpression struct {
+	Token token.Token // Less than operator
+	Exprs []Expression
+}
+
+func (lte *LessThanExpression) TokenLiteral() string {
+	return lte.Token.Literal
+}
+func (lte *LessThanExpression) String() string {
+	return fmt.Sprintf("(< %s)", concatExprsAsString(lte.Exprs))
+}
+
+type GreaterThanEqualExpression struct {
+	Token token.Token // Greater than equal operator
+	Exprs []Expression
+}
+
+func (gtee *GreaterThanEqualExpression) TokenLiteral() string {
+	return gtee.Token.Literal
+}
+func (gtee *GreaterThanEqualExpression) String() string {
+	return fmt.Sprintf("(>= %s)", concatExprsAsString(gtee.Exprs))
+}
+
+type LessThanEqualExpression struct {
+	Token token.Token // Less than equal operator
+	Exprs []Expression
+}
+
+func (gtee *LessThanEqualExpression) TokenLiteral() string {
+	return gtee.Token.Literal
+}
+func (gtee *LessThanEqualExpression) String() string {
+	return fmt.Sprintf("(<= %s)", concatExprsAsString(gtee.Exprs))
 }
 
 func concatExprsAsString(exprs []Expression) string {

@@ -66,6 +66,14 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseOperationExpression()
 	case token.NOT:
 		expr = p.parseOperationExpression()
+	case token.GreaterThan:
+		expr = p.parseOperationExpression()
+	case token.LessThan:
+		expr = p.parseOperationExpression()
+	case token.GreaterThanEqual:
+		expr = p.parseOperationExpression()
+	case token.LessThanEqual:
+		expr = p.parseOperationExpression()
 	case token.BOOL:
 		expr = p.parseBoolLiteral()
 	case token.INT:
@@ -146,6 +154,14 @@ func mapToExpression(tok token.Token, exprs []ast.Expression) ast.Expression {
 		expr = &ast.AndExpression{Token: tok, Exprs: exprs}
 	case token.OR:
 		expr = &ast.OrExpression{Token: tok, Exprs: exprs}
+	case token.GreaterThan:
+		expr = &ast.GreaterThanExpression{Token: tok, Exprs: exprs}
+	case token.LessThan:
+		expr = &ast.LessThanExpression{Token: tok, Exprs: exprs}
+	case token.GreaterThanEqual:
+		expr = &ast.GreaterThanEqualExpression{Token: tok, Exprs: exprs}
+	case token.LessThanEqual:
+		expr = &ast.LessThanEqualExpression{Token: tok, Exprs: exprs}
 	}
 	return expr
 }

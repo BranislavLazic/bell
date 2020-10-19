@@ -21,8 +21,8 @@ const (
 	NOT              = "NOT"
 	AND              = "AND"
 	OR               = "OR"
-	GreaterThen      = "GREATER_THEN"
-	LessThen         = "LESS_THEN"
+	GreaterThan      = "GREATER_THAN"
+	LessThan         = "LESS_THAN"
 	GreaterThanEqual = "GREATER_THAN_EQUAL"
 	LessThanEqual    = "LESS_THAN_EQUAL"
 )

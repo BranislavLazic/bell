@@ -31,6 +31,22 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.DIVIDE, l.ch)
 	case '=':
 		tok = newToken(token.EQUAL, l.ch)
+	case '>':
+		if l.peekChar() == '=' {
+			l.readChar()
+			tok.Literal = ">="
+			tok.Type = token.GreaterThanEqual
+		} else {
+			tok = newToken(token.GreaterThan, l.ch)
+		}
+	case '<':
+		if l.peekChar() == '=' {
+			l.readChar()
+			tok.Literal = "<="
+			tok.Type = token.LessThanEqual
+		} else {
+			tok = newToken(token.LessThan, l.ch)
+		}
 	case '(':
 		tok = newToken(token.StartExpression, l.ch)
 	case ')':

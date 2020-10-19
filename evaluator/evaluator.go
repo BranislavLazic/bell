@@ -26,6 +26,14 @@ func Eval(node ast.Node) object.Object {
 		return evalExpression(node, node.Exprs)
 	case *ast.OrExpression:
 		return evalExpression(node, node.Exprs)
+	case *ast.GreaterThanExpression:
+		return evalGreaterThan(node, node.Exprs)
+	case *ast.GreaterThanEqualExpression:
+		return evalGreaterThanEqual(node, node.Exprs)
+	case *ast.LessThanExpression:
+		return evalLessThan(node, node.Exprs)
+	case *ast.LessThanEqualExpression:
+		return evalLessThanEqual(node, node.Exprs)
 	case *ast.NegativeValueExpression:
 		value := Eval(node.Expr)
 		return evalNegateExpression(value)
@@ -140,6 +148,53 @@ func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object
 	default:
 		return res
 	}
+}
+
+func evalComparison(exprType ast.Node, exprs []ast.Expression, comparator func(left int64, right int64) bool) object.Object {
+	var accumResult object.Object
+	for _, expr := range exprs {
+		evalExpr := Eval(expr)
+		if accumResult == nil {
+			accumResult = evalExpr
+		} else {
+			switch {
+			case evalExpr.Type() == object.IntegerObj && accumResult.Type() == object.IntegerObj:
+				if comparator(accumResult.(*object.Integer).Value, evalExpr.(*object.Integer).Value) {
+					return &object.Boolean{Value: false}
+				}
+			default:
+				return &object.RuntimeError{
+					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
+						exprType.String(), accumResult.Type(), evalExpr.Type()),
+				}
+			}
+		}
+	}
+	return &object.Boolean{Value: true}
+}
+
+func evalGreaterThan(exprType ast.Node, exprs []ast.Expression) object.Object {
+	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+		return left <= right
+	})
+}
+
+func evalGreaterThanEqual(exprType ast.Node, exprs []ast.Expression) object.Object {
+	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+		return left < right
+	})
+}
+
+func evalLessThan(exprType ast.Node, exprs []ast.Expression) object.Object {
+	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+		return left >= right
+	})
+}
+
+func evalLessThanEqual(exprType ast.Node, exprs []ast.Expression) object.Object {
+	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+		return left > right
+	})
 }
 
 func evalNegateExpression(value object.Object) object.Object {
