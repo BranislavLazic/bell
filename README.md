@@ -20,6 +20,7 @@ Example
 |`-`|Subtracts expressions|(- 3 1) will evaluate to 2|
 |`*`|Multiplies expressions|(* 3 4) will evaluate to 12|
 |`/`|Divides expressions|(/ 6 2) will evaluate to 3|
+|`%`|Modulo division (produces a remainder of an integer division)|(% 6 2) will evaluate to 0|
 
 #### Relational operators
 |Operator|Description|Example|
@@ -42,7 +43,7 @@ Example
 
 Bell supports following types:
 
-- numbers - 64-bit signed integers
+- 64-bit signed integers
 
 - booleans - `true` or `false`
 
