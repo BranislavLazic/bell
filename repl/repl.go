@@ -31,7 +31,7 @@ func Start(in io.Reader, out io.Writer) {
 			_, _ = out.Write([]byte(parserErrs))
 		} else {
 			evalRes := evaluator.Eval(program)
-			evalResult := fmt.Sprintf("%+v\n", evalRes)
+			evalResult := fmt.Sprintf("%+v\n", evalRes.Inspect())
 			_, err := out.Write([]byte(evalResult))
 			if err != nil {
 				fmt.Println("Failed to write a result.")

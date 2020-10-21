@@ -127,6 +127,18 @@ func (oe *OrExpression) String() string {
 	return fmt.Sprintf("(or %s)", concatExprsAsString(oe.Exprs))
 }
 
+type ModuloExpression struct {
+	Token token.Token // Modulo operator
+	Exprs []Expression
+}
+
+func (me *ModuloExpression) TokenLiteral() string {
+	return me.Token.Literal
+}
+func (me *ModuloExpression) String() string {
+	return fmt.Sprintf("(%% %s)", concatExprsAsString(me.Exprs))
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64

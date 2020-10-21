@@ -56,6 +56,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseOperationExpression()
 	case token.DIVIDE:
 		expr = p.parseOperationExpression()
+	case token.MODULO:
+		expr = p.parseOperationExpression()
 	case token.EQUAL:
 		expr = p.parseOperationExpression()
 	case token.NotEqual:
@@ -146,6 +148,8 @@ func mapToExpression(tok token.Token, exprs []ast.Expression) ast.Expression {
 		expr = &ast.MultiplyExpression{Token: tok, Exprs: exprs}
 	case token.DIVIDE:
 		expr = &ast.DivideExpression{Token: tok, Exprs: exprs}
+	case token.MODULO:
+		expr = &ast.ModuloExpression{Token: tok, Exprs: exprs}
 	case token.EQUAL:
 		expr = &ast.EqualExpression{Token: tok, Exprs: exprs}
 	case token.NotEqual:

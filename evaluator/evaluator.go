@@ -18,6 +18,8 @@ func Eval(node ast.Node) object.Object {
 		return evalExpression(node, node.Exprs)
 	case *ast.DivideExpression:
 		return evalExpression(node, node.Exprs)
+	case *ast.ModuloExpression:
+		return evalExpression(node, node.Exprs)
 	case *ast.EqualExpression:
 		return evalEqualForAll(node, node.Exprs)
 	case *ast.NotEqualExpression:
@@ -89,6 +91,8 @@ func evalArithmeticOperation(exprType ast.Node, left *object.Integer, right *obj
 		return &object.Integer{Value: left.Value * right.Value}
 	case *ast.DivideExpression:
 		return &object.Integer{Value: left.Value / right.Value}
+	case *ast.ModuloExpression:
+		return &object.Integer{Value: left.Value % right.Value}
 	case *ast.EqualExpression:
 		return &object.Boolean{Value: left.Value == right.Value}
 	case *ast.NotEqualExpression:

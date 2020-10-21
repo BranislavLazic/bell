@@ -10,12 +10,12 @@ const (
 	EOF             = "EOF"
 	EOL             = "EOL"
 	ILLEGAL         = "ILLEGAL"
-	IdentTooLong    = "IDENT_TOO_LONG"
 	// Operators
 	ADD              = "ADD"
 	SUBTRACT         = "SUBTRACT"
 	MULTIPLY         = "MULTIPLY"
 	DIVIDE           = "DIVIDE"
+	MODULO           = "MODULO"
 	EQUAL            = "EQUAL"
 	NotEqual         = "NOT_EQUAL"
 	NOT              = "NOT"
