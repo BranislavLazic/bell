@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/branislavlazic/bell/evaluator"
+	"github.com/branislavlazic/bell/object"
 	"io"
 	"os"
 
@@ -15,6 +16,7 @@ const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 	for {
 		fmt.Printf(PROMPT)
 		scanned := scanner.Scan()
@@ -27,10 +29,12 @@ func Start(in io.Reader, out io.Writer) {
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors) > 0 {
-			parserErrs := fmt.Sprintf("%+v\n", p.Errors)
-			_, _ = out.Write([]byte(parserErrs))
+			for _, err := range p.Errors {
+				parserErrs := fmt.Sprintf("%s\n", err)
+				_, _ = out.Write([]byte(parserErrs))
+			}
 		} else {
-			evalRes := evaluator.Eval(program)
+			evalRes := evaluator.Eval(program, env)
 			evalResult := fmt.Sprintf("%+v\n", evalRes.Inspect())
 			_, err := out.Write([]byte(evalResult))
 			if err != nil {

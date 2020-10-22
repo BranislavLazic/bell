@@ -6,42 +6,53 @@ import (
 	"github.com/branislavlazic/bell/object"
 )
 
-func Eval(node ast.Node) object.Object {
+func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalExpressions(node.Expressions)
+		return evalExpressions(node.Expressions, env)
 	case *ast.AddExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.SubtractExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.MultiplyExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.DivideExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.ModuloExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.EqualExpression:
-		return evalEqualForAll(node, node.Exprs)
+		return evalEqualForAll(node, node.Exprs, env)
 	case *ast.NotEqualExpression:
-		return evalNotEqualForAll(node, node.Exprs)
+		return evalNotEqualForAll(node, node.Exprs, env)
 	case *ast.AndExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.OrExpression:
-		return evalExpression(node, node.Exprs)
+		return evalExpression(node, node.Exprs, env)
 	case *ast.GreaterThanExpression:
-		return evalGreaterThan(node, node.Exprs)
+		return evalGreaterThan(node, node.Exprs, env)
 	case *ast.GreaterThanEqualExpression:
-		return evalGreaterThanEqual(node, node.Exprs)
+		return evalGreaterThanEqual(node, node.Exprs, env)
 	case *ast.LessThanExpression:
-		return evalLessThan(node, node.Exprs)
+		return evalLessThan(node, node.Exprs, env)
 	case *ast.LessThanEqualExpression:
-		return evalLessThanEqual(node, node.Exprs)
+		return evalLessThanEqual(node, node.Exprs, env)
 	case *ast.NegativeValueExpression:
-		value := Eval(node.Expr)
+		value := Eval(node.Expr, env)
 		return evalNegateExpression(value)
 	case *ast.NotExpression:
-		value := Eval(node.Expr)
+		value := Eval(node.Expr, env)
 		return evalNotExpression(value)
+	case *ast.LetExpression:
+		ident := node.Identifier.String()
+		val := Eval(node.Expr, env)
+		env.Set(ident, val)
+		return val
+	case *ast.Identifier:
+		val, ok := env.Get(node.Value)
+		if !ok {
+			return &object.Null{}
+		}
+		return val
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
@@ -51,10 +62,10 @@ func Eval(node ast.Node) object.Object {
 	}
 }
 
-func evalExpression(exprType ast.Node, exprs []ast.Expression) object.Object {
+func evalExpression(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
 	var accumResult object.Object
 	for _, expr := range exprs {
-		evalExpr := Eval(expr)
+		evalExpr := Eval(expr, env)
 		// Declare first value as an accumulator
 		if accumResult == nil {
 			accumResult = evalExpr
@@ -117,10 +128,10 @@ func evalLogicalOperation(exprType ast.Node, left *object.Boolean, right *object
 	}
 }
 
-func evalEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object {
+func evalEqualForAll(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
 	var accumResult object.Object
 	for _, expr := range exprs {
-		evalExpr := Eval(expr)
+		evalExpr := Eval(expr, env)
 		if accumResult == nil {
 			accumResult = evalExpr
 		} else {
@@ -144,8 +155,8 @@ func evalEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object {
 	return &object.Boolean{Value: true}
 }
 
-func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object {
-	res := evalEqualForAll(exprType, exprs)
+func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
+	res := evalEqualForAll(exprType, exprs, env)
 	switch res.(type) {
 	case *object.Boolean:
 		return &object.Boolean{Value: !res.(*object.Boolean).Value}
@@ -154,10 +165,10 @@ func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression) object.Object
 	}
 }
 
-func evalComparison(exprType ast.Node, exprs []ast.Expression, comparator func(left int64, right int64) bool) object.Object {
+func evalComparison(exprType ast.Node, exprs []ast.Expression, env *object.Environment, comparator func(left int64, right int64) bool) object.Object {
 	var accumResult object.Object
 	for _, expr := range exprs {
-		evalExpr := Eval(expr)
+		evalExpr := Eval(expr, env)
 		if accumResult == nil {
 			accumResult = evalExpr
 		} else {
@@ -177,26 +188,26 @@ func evalComparison(exprType ast.Node, exprs []ast.Expression, comparator func(l
 	return &object.Boolean{Value: true}
 }
 
-func evalGreaterThan(exprType ast.Node, exprs []ast.Expression) object.Object {
-	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+func evalGreaterThan(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
+	return evalComparison(exprType, exprs, env, func(left int64, right int64) bool {
 		return left <= right
 	})
 }
 
-func evalGreaterThanEqual(exprType ast.Node, exprs []ast.Expression) object.Object {
-	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+func evalGreaterThanEqual(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
+	return evalComparison(exprType, exprs, env, func(left int64, right int64) bool {
 		return left < right
 	})
 }
 
-func evalLessThan(exprType ast.Node, exprs []ast.Expression) object.Object {
-	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+func evalLessThan(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
+	return evalComparison(exprType, exprs, env, func(left int64, right int64) bool {
 		return left >= right
 	})
 }
 
-func evalLessThanEqual(exprType ast.Node, exprs []ast.Expression) object.Object {
-	return evalComparison(exprType, exprs, func(left int64, right int64) bool {
+func evalLessThanEqual(exprType ast.Node, exprs []ast.Expression, env *object.Environment) object.Object {
+	return evalComparison(exprType, exprs, env, func(left int64, right int64) bool {
 		return left > right
 	})
 }
@@ -223,10 +234,10 @@ func evalNotExpression(value object.Object) object.Object {
 	}
 }
 
-func evalExpressions(exprs []ast.Expression) object.Object {
+func evalExpressions(exprs []ast.Expression, env *object.Environment) object.Object {
 	var result object.Object
 	for _, expr := range exprs {
-		result = Eval(expr)
+		result = Eval(expr, env)
 	}
 	return result
 }

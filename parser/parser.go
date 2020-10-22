@@ -28,13 +28,16 @@ func New(l *lexer.Lexer) *Parser {
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Expressions = []ast.Expression{}
-	for p.curToken.Type != token.EOF {
+	for p.curToken.Type != token.EOF && len(p.Errors) == 0 {
 		var expr ast.Expression
 		// Start by checking whether the current token is StartExpression.
 		// If so, start parsing an expression.
 		if p.curToken.Type == token.StartExpression {
 			p.parensCount++
 			expr = p.parseExpression()
+		} else {
+			p.Errors = append(p.Errors, "An expression must start with '('.")
+			return program
 		}
 		if expr != nil {
 			program.Expressions = append(program.Expressions, expr)
@@ -76,6 +79,10 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseOperationExpression()
 	case token.LessThanEqual:
 		expr = p.parseOperationExpression()
+	case token.LET:
+		expr = p.parseLetExpression()
+	case token.IDENT:
+		expr = p.parseIdentifier()
 	case token.BOOL:
 		expr = p.parseBoolLiteral()
 	case token.INT:
@@ -86,6 +93,9 @@ func (p *Parser) parseExpression() ast.Expression {
 	case token.EndExpression:
 		p.parensCount--
 		expr = p.parseNextExpression()
+	case token.ILLEGAL:
+		p.Errors = append(p.Errors, fmt.Sprintf("Illegal token found '%s'.", p.peekToken.Literal))
+		break
 	default:
 		break
 	}
@@ -102,6 +112,10 @@ func (p *Parser) parseNextExpression() ast.Expression {
 
 // Parse all mathematical operations
 func (p *Parser) parseOperationExpression() ast.Expression {
+	// Every operation must begin with '('
+	if !p.isExpressionStart() {
+		return nil
+	}
 	p.nextToken()
 	tok := p.curToken
 	var exprs []ast.Expression
@@ -170,6 +184,23 @@ func mapToExpression(tok token.Token, exprs []ast.Expression) ast.Expression {
 	return expr
 }
 
+func (p *Parser) parseLetExpression() ast.Expression {
+	p.nextToken()
+	letTok := p.curToken
+	if p.peekToken.Type != token.IDENT {
+		p.Errors = append(p.Errors, "'let' should be followed by an identifier.")
+		return nil
+	}
+	ident := p.parseIdentifier()
+	expr := p.parseExpression()
+	return &ast.LetExpression{Token: letTok, Identifier: ident, Expr: expr}
+}
+
+func (p *Parser) parseIdentifier() *ast.Identifier {
+	p.nextToken()
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
+
 func (p *Parser) parseIntLiteral() *ast.IntegerLiteral {
 	p.nextToken()
 	value, err := strconv.Atoi(p.curToken.Literal)
@@ -203,10 +234,19 @@ func (p *Parser) finalizeExpression() {
 func (p *Parser) checkParenthesesCount() {
 	if len(p.Errors) == 0 {
 		if p.parensCount > 0 {
-			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d closing parentheses", p.parensCount))
+			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d closing parentheses.", p.parensCount))
 		}
 		if p.parensCount < 0 {
-			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d opening parentheses", int(math.Abs(float64(p.parensCount)))))
+			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d opening parentheses.", int(math.Abs(float64(p.parensCount)))))
 		}
 	}
+}
+
+func (p *Parser) isExpressionStart() bool {
+	if p.curToken.Type != token.StartExpression {
+		p.Errors = append(p.Errors, "An expression must start with '('.")
+		p.nextToken()
+		return false
+	}
+	return true
 }

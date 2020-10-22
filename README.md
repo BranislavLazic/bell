@@ -8,9 +8,14 @@ A programming language based on Lisp
 
 ### Operators
 
-Example
+Example of area calculation
 
-`(+ 1 2 3)`
+```
+(let length 5)
+(let width 4)
+
+(let area (* length width))
+```
 
 #### Arithmetic operators
 
@@ -55,3 +60,17 @@ On the other hand, logical operations can only accept booleans. Expression: `(an
 
 Relational operations produce boolean values and can be mixed with logical operations.
 Expression `(and true (> 4 5))` will evaluate to `false`.
+
+#### Assignment
+
+`(let x 3)`
+
+`let` is a keyword
+
+`x` is a variable identifier
+
+`3` is an assigned value
+
+More complex expressions can be also assigned
+
+`(let x (* 3 6))`

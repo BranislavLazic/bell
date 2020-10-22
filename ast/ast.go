@@ -235,6 +235,32 @@ func (gtee *LessThanEqualExpression) String() string {
 	return fmt.Sprintf("(<= %s)", concatExprsAsString(gtee.Exprs))
 }
 
+type Identifier struct {
+	Token token.Token // IDENT token
+	Value string
+}
+
+func (i *Identifier) TokenLiteral() string {
+	return i.Token.Literal
+}
+
+func (i *Identifier) String() string {
+	return i.Value
+}
+
+type LetExpression struct {
+	Token      token.Token // "let" keyword
+	Identifier *Identifier
+	Expr       Expression // Single expression following
+}
+
+func (le *LetExpression) TokenLiteral() string {
+	return le.Token.Literal
+}
+func (le *LetExpression) String() string {
+	return fmt.Sprintf("(let %s %s)", le.Identifier.String(), le.Expr.String())
+}
+
 func concatExprsAsString(exprs []Expression) string {
 	var exprsAsStrArr []string
 	for _, expr := range exprs {

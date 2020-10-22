@@ -7,6 +7,8 @@ const (
 	EndExpression   = "END_EXPRESSION"
 	INT             = "INT"
 	BOOL            = "BOOL"
+	LET             = "LET"
+	IDENT           = "IDENT"
 	EOF             = "EOF"
 	EOL             = "EOL"
 	ILLEGAL         = "ILLEGAL"
@@ -34,6 +36,7 @@ var keywords = map[string]TokType{
 	"or":    OR,
 	"not":   NOT,
 	"not=":  NotEqual,
+	"let":   LET,
 }
 
 func LookupKeyword(instruction string) TokType {
