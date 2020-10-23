@@ -3,14 +3,15 @@ package e2e
 import (
 	"flag"
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/branislavlazic/bell/evaluator"
 	"github.com/branislavlazic/bell/lexer"
 	"github.com/branislavlazic/bell/object"
 	"github.com/branislavlazic/bell/parser"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
-	"os"
-	"testing"
 )
 
 var godogs int
@@ -68,7 +69,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 var opts = godog.Options{
 	Output: colors.Colored(os.Stdout),
 	Format: "progress",
-	//Tags: "@wip",
+	// Tags:   "@wip",
 }
 
 func init() {

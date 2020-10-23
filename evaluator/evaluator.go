@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+
 	"github.com/branislavlazic/bell/ast"
 	"github.com/branislavlazic/bell/object"
 )
@@ -44,6 +45,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalLetExpression(node, env)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
+	case *ast.ListExpression:
+		return evalListExpression(node, env)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
@@ -230,6 +233,15 @@ func evalLetExpression(letExpr *ast.LetExpression, env *object.Environment) obje
 	val := Eval(letExpr.Expr, env)
 	env.Set(ident, val)
 	return val
+}
+
+func evalListExpression(listExpression *ast.ListExpression, env *object.Environment) object.Object {
+	list := &object.List{Objects: []object.Object{}}
+	for _, expr := range listExpression.Exprs {
+		res := Eval(expr, env)
+		list.Objects = append(list.Objects, res)
+	}
+	return list
 }
 
 func evalIdentifier(ident *ast.Identifier, env *object.Environment) object.Object {

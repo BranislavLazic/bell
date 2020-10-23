@@ -1,12 +1,16 @@
 package object
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type ObjectType string
 
 const (
 	IntegerObj      = "INTEGER"
 	BooleanObj      = "BOOLEAN"
+	ListObj         = "LIST"
 	NilObj          = "NIL"
 	RuntimeErrorObj = "RUNTIME_ERROR"
 )
@@ -36,6 +40,21 @@ func (b *Boolean) Type() ObjectType {
 }
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+
+type List struct {
+	Objects []Object
+}
+
+func (l *List) Type() ObjectType {
+	return ListObj
+}
+func (l *List) Inspect() string {
+	var exprsAsStrArr []string
+	for _, obj := range l.Objects {
+		exprsAsStrArr = append(exprsAsStrArr, obj.Inspect())
+	}
+	return strings.Join(exprsAsStrArr, " ")
 }
 
 type RuntimeError struct {

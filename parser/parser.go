@@ -129,6 +129,7 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 	// If the prefix token is "not", one expression is present,
 	// and there are no other expressions, then it's a logical not expression.
 	if isNotOperation {
+		p.nextToken()
 		return &ast.NotExpression{Token: tok, Expr: leadingExpr}
 	}
 	if leadingExpr == nil {
