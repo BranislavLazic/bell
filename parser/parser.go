@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/branislavlazic/bell/ast"
@@ -28,23 +27,26 @@ func New(l *lexer.Lexer) *Parser {
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Expressions = []ast.Expression{}
-	for p.curToken.Type != token.EOF && len(p.Errors) == 0 {
+	for p.curToken.Type != token.EOF {
 		var expr ast.Expression
 		// Start by checking whether the current token is StartExpression.
 		// If so, start parsing an expression.
 		if p.curToken.Type == token.StartExpression {
-			p.parensCount++
 			expr = p.parseExpression()
-		} else {
-			p.Errors = append(p.Errors, "An expression must start with '('.")
-			return program
+		}
+		// If there are any errors after parsing an expression,
+		// break any further parsing.
+		if len(p.Errors) > 0 {
+			break
 		}
 		if expr != nil {
 			program.Expressions = append(program.Expressions, expr)
 		}
 		p.nextToken()
 	}
-	p.checkParenthesesCount()
+	if len(program.Expressions) == 0 && len(p.Errors) == 0 {
+		p.Errors = append(p.Errors, "No expression given.")
+	}
 	return program
 }
 
@@ -88,34 +90,28 @@ func (p *Parser) parseExpression() ast.Expression {
 	case token.INT:
 		expr = p.parseIntLiteral()
 	case token.StartExpression:
-		p.parensCount++
-		expr = p.parseNextExpression()
+		p.nextToken()
+		expr = p.parseExpression()
 	case token.EndExpression:
-		p.parensCount--
-		expr = p.parseNextExpression()
+		p.nextToken()
+		expr = p.parseExpression()
+	case token.EOL:
+		p.nextToken()
+		expr = p.parseExpression()
 	case token.ILLEGAL:
-		p.Errors = append(p.Errors, fmt.Sprintf("Illegal token found '%s'.", p.peekToken.Literal))
+		p.Errors = append(
+			p.Errors,
+			fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+		)
 		break
 	default:
 		break
 	}
-	// Check for EndExpression token
-	p.finalizeExpression()
-	return expr
-}
-
-func (p *Parser) parseNextExpression() ast.Expression {
-	p.nextToken()
-	expr := p.parseExpression()
 	return expr
 }
 
 // Parse all mathematical operations
 func (p *Parser) parseOperationExpression() ast.Expression {
-	// Every operation must begin with '('
-	if !p.isExpressionStart() {
-		return nil
-	}
 	p.nextToken()
 	tok := p.curToken
 	var exprs []ast.Expression
@@ -123,7 +119,8 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 	// If the prefix is "not", then only a single expression
 	// must be present.
 	isNotOperation := tok.Type == token.NOT && leadingExpr != nil
-	if isNotOperation && p.curToken.Type != token.EndExpression {
+	if isNotOperation && p.peekToken.Type != token.EndExpression {
+		p.nextToken()
 		p.Errors = append(p.Errors, "'not' operation contains more than one expression or lacks a closing parentheses.")
 		return nil
 	}
@@ -137,21 +134,19 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 		return nil
 	}
 	exprs = append(exprs, leadingExpr)
-	for p.curToken.Type == token.EndExpression && (p.peekToken.Type == token.INT || p.peekToken.Type == token.BOOL || p.peekToken.Type == token.StartExpression) {
+	// Parse expressions until '(' is the next token.
+	for p.peekToken.Type != token.EndExpression {
+		if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
+			break
+		}
 		exprs = append(exprs, p.parseExpression())
 	}
-	for p.curToken.Type != token.EndExpression && p.peekToken.Type != token.ILLEGAL && p.peekToken.Type != token.EOF {
-		exprs = append(exprs, p.parseExpression())
-	}
+	p.nextToken()
 	// If the prefix token is "-", one expression is present,
 	// then it's a negated expression.
 	if tok.Type == token.SUBTRACT && len(exprs) == 1 {
 		return &ast.NegativeValueExpression{Token: tok, Expr: leadingExpr}
 	}
-	return mapToExpression(tok, exprs)
-}
-
-func mapToExpression(tok token.Token, exprs []ast.Expression) ast.Expression {
 	var expr ast.Expression
 	switch tok.Type {
 	case token.ADD:
@@ -193,6 +188,18 @@ func (p *Parser) parseLetExpression() ast.Expression {
 	}
 	ident := p.parseIdentifier()
 	expr := p.parseExpression()
+	// Check whether the expression is closed.
+	// If not, then anything following the expression is
+	// an illegal token except of EOF (which gives Unexpected EOF error).
+	if p.peekToken.Type != token.EndExpression {
+		if !p.isPeekEOF() {
+			p.Errors = append(
+				p.Errors,
+				fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+			)
+		}
+	}
+	p.nextToken()
 	return &ast.LetExpression{Token: letTok, Identifier: ident, Expr: expr}
 }
 
@@ -224,29 +231,28 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.lxr.NextToken()
 }
 
-func (p *Parser) finalizeExpression() {
-	for p.peekToken.Type == token.EndExpression {
-		p.parensCount--
-		p.nextToken()
+func (p *Parser) isPeekEOF() bool {
+	if p.peekToken.Type == token.EOF {
+		p.Errors = append(p.Errors, fmt.Sprintf("Unexpected EOF at index %d.", p.lxr.Position-1))
+		return true
 	}
+	return false
 }
 
-func (p *Parser) checkParenthesesCount() {
-	if len(p.Errors) == 0 {
-		if p.parensCount > 0 {
-			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d closing parentheses.", p.parensCount))
-		}
-		if p.parensCount < 0 {
-			p.Errors = append(p.Errors, fmt.Sprintf("Missing %d opening parentheses.", int(math.Abs(float64(p.parensCount)))))
-		}
+func (p *Parser) isPeekIllegal() bool {
+	if p.peekToken.Type == token.ILLEGAL {
+		p.Errors = append(p.Errors, fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1))
+		return true
 	}
+	return false
 }
 
-func (p *Parser) isExpressionStart() bool {
-	if p.curToken.Type != token.StartExpression {
-		p.Errors = append(p.Errors, "An expression must start with '('.")
-		p.nextToken()
-		return false
+func (p *Parser) isPeekOperator() bool {
+	for _, op := range token.OperatorLiterals {
+		if p.peekToken.Literal == op {
+			p.Errors = append(p.Errors, fmt.Sprintf("Illegal use of operator %s at index %d.", p.peekToken.Literal, p.lxr.Position-1))
+			return true
+		}
 	}
-	return true
+	return false
 }

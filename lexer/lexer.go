@@ -6,7 +6,7 @@ import (
 
 type Lexer struct {
 	input        string
-	position     int
+	Position     int
 	readPosition int
 	ch           byte
 }
@@ -91,7 +91,7 @@ func (l *Lexer) readChar() {
 	} else {
 		l.ch = l.input[l.readPosition]
 	}
-	l.position = l.readPosition
+	l.Position = l.readPosition
 	l.readPosition++
 }
 
@@ -103,21 +103,21 @@ func (l *Lexer) peekChar() byte {
 }
 
 func (l *Lexer) readNumber() string {
-	position := l.position
+	position := l.Position
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[position:l.Position]
 }
 
 // Identifier is a sequence of characters and
 // it must begins with a letter
 func (l *Lexer) readIdentifier() string {
-	position := l.position
+	position := l.Position
 	for isLetter(l.ch) || isAllowedFollowingIdentChar(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[position:l.Position]
 }
 
 func (l *Lexer) skipWhitespace() {

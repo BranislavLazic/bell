@@ -9,7 +9,8 @@ import (
 )
 
 func TestParser_ParseLiteral(t *testing.T) {
-	input := `(2)
+	input := `(
+2)
 	(true)`
 	l := lexer.New(input)
 	p := New(l)

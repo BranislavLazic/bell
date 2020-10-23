@@ -2,9 +2,12 @@ APP=bell
 MODULE := github.com/branislavlazic/bell
 VERSION := v0.1
 
-.PHONY: clean binaries
+.PHONY: clean binaries test
 
-all: clean zip
+all: clean test zip
+
+test:
+	go test -v ./...
 
 clean:
 	rm -rf binaries release

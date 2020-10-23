@@ -7,7 +7,7 @@ type ObjectType string
 const (
 	IntegerObj      = "INTEGER"
 	BooleanObj      = "BOOLEAN"
-	NullObj         = "NULL"
+	NilObj          = "NIL"
 	RuntimeErrorObj = "RUNTIME_ERROR"
 )
 
@@ -49,11 +49,11 @@ func (re *RuntimeError) Inspect() string {
 	return fmt.Sprintf("Error: %s", re.Error)
 }
 
-type Null struct{}
+type Nil struct{}
 
-func (n *Null) Type() ObjectType {
-	return NullObj
+func (n *Nil) Type() ObjectType {
+	return NilObj
 }
-func (n *Null) Inspect() string {
-	return "null"
+func (n *Nil) Inspect() string {
+	return "nil"
 }

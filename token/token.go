@@ -2,6 +2,11 @@ package token
 
 type TokType string
 
+type Token struct {
+	Type    TokType
+	Literal string
+}
+
 const (
 	StartExpression = "START_EXPRESSION"
 	EndExpression   = "END_EXPRESSION"
@@ -46,7 +51,9 @@ func LookupKeyword(instruction string) TokType {
 	return ILLEGAL
 }
 
-type Token struct {
-	Type    TokType
-	Literal string
-}
+var OperatorLiterals = []string{
+	"+", "-", "%",
+	"*", "-", "/",
+	"=", "not=", "and",
+	"or", ">", ">=",
+	"<", "<=", "not"}

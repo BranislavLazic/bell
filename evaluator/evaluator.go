@@ -37,28 +37,19 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.LessThanEqualExpression:
 		return evalLessThanEqual(node, node.Exprs, env)
 	case *ast.NegativeValueExpression:
-		value := Eval(node.Expr, env)
-		return evalNegateExpression(value)
+		return evalNegateExpression(Eval(node.Expr, env))
 	case *ast.NotExpression:
-		value := Eval(node.Expr, env)
-		return evalNotExpression(value)
+		return evalNotExpression(Eval(node.Expr, env))
 	case *ast.LetExpression:
-		ident := node.Identifier.String()
-		val := Eval(node.Expr, env)
-		env.Set(ident, val)
-		return val
+		return evalLetExpression(node, env)
 	case *ast.Identifier:
-		val, ok := env.Get(node.Value)
-		if !ok {
-			return &object.Null{}
-		}
-		return val
+		return evalIdentifier(node, env)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
 		return &object.Boolean{Value: node.Value}
 	default:
-		return &object.Null{}
+		return &object.Nil{}
 	}
 }
 
@@ -232,6 +223,21 @@ func evalNotExpression(value object.Object) object.Object {
 			Error: fmt.Sprintf("Negation of logical expressions is not applicable for %s types.", value.Type()),
 		}
 	}
+}
+
+func evalLetExpression(letExpr *ast.LetExpression, env *object.Environment) object.Object {
+	ident := letExpr.Identifier.String()
+	val := Eval(letExpr.Expr, env)
+	env.Set(ident, val)
+	return val
+}
+
+func evalIdentifier(ident *ast.Identifier, env *object.Environment) object.Object {
+	val, ok := env.Get(ident.Value)
+	if !ok {
+		return &object.Nil{}
+	}
+	return val
 }
 
 func evalExpressions(exprs []ast.Expression, env *object.Environment) object.Object {
