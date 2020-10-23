@@ -50,6 +50,7 @@ func InitializeTestSuite(ctx *godog.TestSuiteContext) {
 	ctx.BeforeSuite(func() {
 		godogs = 0
 		evalResult = ""
+		parserErrors = []string{}
 	})
 }
 

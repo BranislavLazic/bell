@@ -26,7 +26,7 @@ Feature: Errors for operations
     """
     Then the error is
     """
-    Illegal use of operator + at index 7.
+    Illegal use of operator '+' at index 7.
     """
 
 
@@ -37,5 +37,5 @@ Feature: Errors for operations
     """
     Then the error is
     """
-    Illegal character & found at index 1.
+    Illegal character '&' found at index 1.
     """

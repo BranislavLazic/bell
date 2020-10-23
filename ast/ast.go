@@ -261,6 +261,18 @@ func (le *LetExpression) String() string {
 	return fmt.Sprintf("(let %s %s)", le.Identifier.String(), le.Expr.String())
 }
 
+type ListExpression struct {
+	Token token.Token // list keyword
+	Exprs []Expression
+}
+
+func (le *ListExpression) TokenLiteral() string {
+	return le.Token.Literal
+}
+func (le *ListExpression) String() string {
+	return fmt.Sprintf("(list %s)", concatExprsAsString(le.Exprs))
+}
+
 func concatExprsAsString(exprs []Expression) string {
 	var exprsAsStrArr []string
 	for _, expr := range exprs {

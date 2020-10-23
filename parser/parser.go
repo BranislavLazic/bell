@@ -83,6 +83,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseOperationExpression()
 	case token.LET:
 		expr = p.parseLetExpression()
+	case token.LIST:
+		expr = p.parseOperationExpression()
 	case token.IDENT:
 		expr = p.parseIdentifier()
 	case token.BOOL:
@@ -101,7 +103,7 @@ func (p *Parser) parseExpression() ast.Expression {
 	case token.ILLEGAL:
 		p.Errors = append(
 			p.Errors,
-			fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+			fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
 		)
 		break
 	default:
@@ -110,7 +112,7 @@ func (p *Parser) parseExpression() ast.Expression {
 	return expr
 }
 
-// Parse all mathematical operations
+// Parse arithmetic, relational, logic operations and list
 func (p *Parser) parseOperationExpression() ast.Expression {
 	p.nextToken()
 	tok := p.curToken
@@ -175,6 +177,8 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 		expr = &ast.GreaterThanEqualExpression{Token: tok, Exprs: exprs}
 	case token.LessThanEqual:
 		expr = &ast.LessThanEqualExpression{Token: tok, Exprs: exprs}
+	case token.LIST:
+		expr = &ast.ListExpression{Token: tok, Exprs: exprs}
 	}
 	return expr
 }
@@ -195,7 +199,7 @@ func (p *Parser) parseLetExpression() ast.Expression {
 		if !p.isPeekEOF() {
 			p.Errors = append(
 				p.Errors,
-				fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
 			)
 		}
 	}
@@ -241,7 +245,7 @@ func (p *Parser) isPeekEOF() bool {
 
 func (p *Parser) isPeekIllegal() bool {
 	if p.peekToken.Type == token.ILLEGAL {
-		p.Errors = append(p.Errors, fmt.Sprintf("Illegal character %s found at index %d.", p.peekToken.Literal, p.lxr.Position-1))
+		p.Errors = append(p.Errors, fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1))
 		return true
 	}
 	return false
@@ -250,7 +254,7 @@ func (p *Parser) isPeekIllegal() bool {
 func (p *Parser) isPeekOperator() bool {
 	for _, op := range token.OperatorLiterals {
 		if p.peekToken.Literal == op {
-			p.Errors = append(p.Errors, fmt.Sprintf("Illegal use of operator %s at index %d.", p.peekToken.Literal, p.lxr.Position-1))
+			p.Errors = append(p.Errors, fmt.Sprintf("Illegal use of operator '%s' at index %d.", p.peekToken.Literal, p.lxr.Position-1))
 			return true
 		}
 	}

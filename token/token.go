@@ -13,6 +13,7 @@ const (
 	INT             = "INT"
 	BOOL            = "BOOL"
 	LET             = "LET"
+	LIST            = "LIST"
 	IDENT           = "IDENT"
 	EOF             = "EOF"
 	EOL             = "EOL"
@@ -42,6 +43,7 @@ var keywords = map[string]TokType{
 	"not":   NOT,
 	"not=":  NotEqual,
 	"let":   LET,
+	"list":  LIST,
 }
 
 func LookupKeyword(instruction string) TokType {
@@ -56,4 +58,4 @@ var OperatorLiterals = []string{
 	"*", "-", "/",
 	"=", "not=", "and",
 	"or", ">", ">=",
-	"<", "<=", "not"}
+	"<", "<=", "not", "list"}
