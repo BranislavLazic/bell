@@ -46,7 +46,7 @@ func (re *RuntimeError) Type() ObjectType {
 	return RuntimeErrorObj
 }
 func (re *RuntimeError) Inspect() string {
-	return fmt.Sprintf("Error: %s", re.Error)
+	return re.Error
 }
 
 type Nil struct{}

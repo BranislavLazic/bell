@@ -7,7 +7,7 @@ VERSION := v0.1
 all: clean test zip
 
 test:
-	go test -v ./...
+	go test -count=1 -v ./...
 
 clean:
 	rm -rf binaries release
