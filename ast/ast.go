@@ -273,6 +273,23 @@ func (le *ListExpression) String() string {
 	return fmt.Sprintf("(list %s)", concatExprsAsString(le.Exprs))
 }
 
+type IfExpression struct {
+	Token     token.Token // if keyword
+	Condition Expression
+	Expr      Expression
+	ElseExpr  Expression
+}
+
+func (ie *IfExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+func (ie *IfExpression) String() string {
+	if ie.ElseExpr != nil {
+		return fmt.Sprintf("(if %s %s %s)", ie.Condition, ie.Expr, ie.ElseExpr)
+	}
+	return fmt.Sprintf("(if %s %s)", ie.Condition, ie.Expr)
+}
+
 func concatExprsAsString(exprs []Expression) string {
 	var exprsAsStrArr []string
 	for _, expr := range exprs {

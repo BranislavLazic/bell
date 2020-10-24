@@ -10,11 +10,10 @@ import (
 )
 
 type Parser struct {
-	lxr         *lexer.Lexer
-	curToken    token.Token
-	peekToken   token.Token
-	parensCount int
-	Errors      []string
+	lxr       *lexer.Lexer
+	curToken  token.Token
+	peekToken token.Token
+	Errors    []string
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -83,6 +82,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseOperationExpression()
 	case token.LET:
 		expr = p.parseLetExpression()
+	case token.IF:
+		expr = p.parseIfExpression()
 	case token.LIST:
 		expr = p.parseOperationExpression()
 	case token.IDENT:
@@ -206,6 +207,24 @@ func (p *Parser) parseLetExpression() ast.Expression {
 	}
 	p.nextToken()
 	return &ast.LetExpression{Token: letTok, Identifier: ident, Expr: expr}
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	p.nextToken()
+	ifTok := p.curToken
+	cond := p.parseExpression()
+	expr := p.parseExpression()
+	elseExpr := p.parseExpression()
+	if p.curToken.Type != token.EndExpression {
+		if !p.isPeekEOF() {
+			p.Errors = append(
+				p.Errors,
+				fmt.Sprintf("Illegal character '%s' found at index %d.", p.curToken.Literal, p.lxr.Position-1),
+			)
+		}
+	}
+	p.nextToken()
+	return &ast.IfExpression{Token: ifTok, Condition: cond, Expr: expr, ElseExpr: elseExpr}
 }
 
 func (p *Parser) parseIdentifier() *ast.Identifier {

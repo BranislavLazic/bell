@@ -13,6 +13,7 @@ const (
 	INT             = "INT"
 	BOOL            = "BOOL"
 	LET             = "LET"
+	IF              = "IF"
 	LIST            = "LIST"
 	IDENT           = "IDENT"
 	EOF             = "EOF"
@@ -43,6 +44,7 @@ var keywords = map[string]TokType{
 	"not":   NOT,
 	"not=":  NotEqual,
 	"let":   LET,
+	"if":    IF,
 	"list":  LIST,
 }
 
@@ -58,4 +60,4 @@ var OperatorLiterals = []string{
 	"*", "-", "/",
 	"=", "not=", "and",
 	"or", ">", ">=",
-	"<", "<=", "not", "list"}
+	"<", "<=", "not", "list", "if"}
