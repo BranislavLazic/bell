@@ -276,7 +276,7 @@ func (le *ListExpression) String() string {
 type IfExpression struct {
 	Token     token.Token // if keyword
 	Condition Expression
-	Expr      Expression
+	ThenExpr  Expression
 	ElseExpr  Expression
 }
 
@@ -284,10 +284,7 @@ func (ie *IfExpression) TokenLiteral() string {
 	return ie.Token.Literal
 }
 func (ie *IfExpression) String() string {
-	if ie.ElseExpr != nil {
-		return fmt.Sprintf("(if %s %s %s)", ie.Condition, ie.Expr, ie.ElseExpr)
-	}
-	return fmt.Sprintf("(if %s %s)", ie.Condition, ie.Expr)
+	return fmt.Sprintf("(if %s %s %s)", ie.Condition, ie.ThenExpr, ie.ElseExpr)
 }
 
 func concatExprsAsString(exprs []Expression) string {

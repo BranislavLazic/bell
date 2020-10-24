@@ -203,6 +203,7 @@ func (p *Parser) parseLetExpression() ast.Expression {
 				p.Errors,
 				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
 			)
+			return nil
 		}
 	}
 	p.nextToken()
@@ -213,18 +214,31 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	p.nextToken()
 	ifTok := p.curToken
 	cond := p.parseExpression()
+	if cond == nil {
+		p.Errors = append(p.Errors, fmt.Sprintf("If expression is missing condition."))
+		return nil
+	}
 	expr := p.parseExpression()
+	if expr == nil {
+		p.Errors = append(p.Errors, fmt.Sprintf("If expression is missing then expression."))
+		return nil
+	}
 	elseExpr := p.parseExpression()
-	if p.curToken.Type != token.EndExpression {
+	if elseExpr == nil {
+		p.Errors = append(p.Errors, fmt.Sprintf("If expression is missing else expression."))
+		return nil
+	}
+	if p.peekToken.Type != token.EndExpression {
 		if !p.isPeekEOF() {
 			p.Errors = append(
 				p.Errors,
-				fmt.Sprintf("Illegal character '%s' found at index %d.", p.curToken.Literal, p.lxr.Position-1),
+				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
 			)
+			return nil
 		}
 	}
 	p.nextToken()
-	return &ast.IfExpression{Token: ifTok, Condition: cond, Expr: expr, ElseExpr: elseExpr}
+	return &ast.IfExpression{Token: ifTok, Condition: cond, ThenExpr: expr, ElseExpr: elseExpr}
 }
 
 func (p *Parser) parseIdentifier() *ast.Identifier {

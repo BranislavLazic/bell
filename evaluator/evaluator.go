@@ -43,6 +43,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalNotExpression(Eval(node.Expr, env))
 	case *ast.LetExpression:
 		return evalLetExpression(node, env)
+	case *ast.IfExpression:
+		return evalIfExpression(node, env)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	case *ast.ListExpression:
@@ -210,10 +212,9 @@ func evalNegateExpression(value object.Object) object.Object {
 	if value.Type() == object.IntegerObj {
 		v := value.(*object.Integer).Value
 		return &object.Integer{Value: -1 * v}
-	} else {
-		return &object.RuntimeError{
-			Error: fmt.Sprintf("Negation of arithmetic expressions is not applicable for %s type.", value.Type()),
-		}
+	}
+	return &object.RuntimeError{
+		Error: fmt.Sprintf("Negation of arithmetic expressions is not applicable for %s type.", value.Type()),
 	}
 }
 
@@ -221,10 +222,9 @@ func evalNotExpression(value object.Object) object.Object {
 	if value.Type() == object.BooleanObj {
 		v := value.(*object.Boolean).Value
 		return &object.Boolean{Value: !v}
-	} else {
-		return &object.RuntimeError{
-			Error: fmt.Sprintf("Negation of logical expressions is not applicable for %s types.", value.Type()),
-		}
+	}
+	return &object.RuntimeError{
+		Error: fmt.Sprintf("Negation of logical expressions is not applicable for %s types.", value.Type()),
 	}
 }
 
@@ -233,6 +233,20 @@ func evalLetExpression(letExpr *ast.LetExpression, env *object.Environment) obje
 	val := Eval(letExpr.Expr, env)
 	env.Set(ident, val)
 	return val
+}
+
+func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.Object {
+	cond := Eval(ifExpr.Condition, env)
+	switch cnd := cond.(type) {
+	case *object.Boolean:
+		if cnd.Value {
+			return Eval(ifExpr.ThenExpr, env)
+		}
+		return Eval(ifExpr.ElseExpr, env)
+	}
+	return &object.RuntimeError{
+		Error: fmt.Sprintf("Condition for if expression should evaluate to BOOLEAN type. Found %s type.", cond.Type()),
+	}
 }
 
 func evalListExpression(listExpression *ast.ListExpression, env *object.Environment) object.Object {

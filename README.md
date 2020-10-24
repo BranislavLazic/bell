@@ -19,30 +19,32 @@ Example of area calculation
 
 #### Arithmetic operators
 
-|Operator|Description|Example|
-|:---:|---|---|
-|`+`|Adds expressions|(+ 1 2 3) will evaluate to 6|
-|`-`|Subtracts expressions|(- 3 1) will evaluate to 2|
-|`*`|Multiplies expressions|(* 3 4) will evaluate to 12|
-|`/`|Divides expressions|(/ 6 2) will evaluate to 3|
-|`%`|Modulo division (produces a remainder of an integer division)|(% 6 2) will evaluate to 0|
+| Operator | Description                                                   | Example                      |
+| :------: | ------------------------------------------------------------- | ---------------------------- |
+|   `+`    | Adds expressions                                              | (+ 1 2 3) will evaluate to 6 |
+|   `-`    | Subtracts expressions                                         | (- 3 1) will evaluate to 2   |
+|   `*`    | Multiplies expressions                                        | (\* 3 4) will evaluate to 12 |
+|   `/`    | Divides expressions                                           | (/ 6 2) will evaluate to 3   |
+|   `%`    | Modulo division (produces a remainder of an integer division) | (% 6 2) will evaluate to 0   |
 
 #### Relational operators
-|Operator|Description|Example|
-|:---:|---|---|
-|`=`|Checks equality between expressions (all values have to be equal to evaluate to true)|(= 2 2 3) will evaluate to false|
-|`not=`|Checks the difference between expressions (one value has to differ to evaluate to true)|(not= 2 2 3) will evaluate to true|
-|`<`|Checks whether the left value is less than the right value|(< 2 3) will evaluate to true|
-|`<=`|Checks whether the left value is less than or equal to the right value|(<= 3 3) will evaluate to true|
-|`>`|Checks whether the left value is greater than the right value|(> 2 3) will evaluate to false|
-|`>=`|Checks whether the left value is greater than or equal to the right value|(>= 3 3) will evaluate to true|
+
+| Operator | Description                                                                             | Example                            |
+| :------: | --------------------------------------------------------------------------------------- | ---------------------------------- |
+|   `=`    | Checks equality between expressions (all values have to be equal to evaluate to true)   | (= 2 2 3) will evaluate to false   |
+|  `not=`  | Checks the difference between expressions (one value has to differ to evaluate to true) | (not= 2 2 3) will evaluate to true |
+|   `<`    | Checks whether the left value is less than the right value                              | (< 2 3) will evaluate to true      |
+|   `<=`   | Checks whether the left value is less than or equal to the right value                  | (<= 3 3) will evaluate to true     |
+|   `>`    | Checks whether the left value is greater than the right value                           | (> 2 3) will evaluate to false     |
+|   `>=`   | Checks whether the left value is greater than or equal to the right value               | (>= 3 3) will evaluate to true     |
 
 #### Logical operators
-|Operator|Description|Example|
-|:---:|---|---|
-|`and`|Logical "and" operator|(and true true false) will evaluate to false|
-|`or`|Logical "or" operator|(or true false false) will evaluate to true|
-|`not`|Logical "or" operator. It can have only a single expression. Otherwise, it will return an error.|(not true) will evaluate to false|
+
+| Operator | Description                                                                                      | Example                                      |
+| :------: | ------------------------------------------------------------------------------------------------ | -------------------------------------------- |
+|  `and`   | Logical "and" operator                                                                           | (and true true false) will evaluate to false |
+|   `or`   | Logical "or" operator                                                                            | (or true false false) will evaluate to true  |
+|  `not`   | Logical "or" operator. It can have only a single expression. Otherwise, it will return an error. | (not true) will evaluate to false            |
 
 #### Types and type rules
 
@@ -74,3 +76,15 @@ Expression `(and true (> 4 5))` will evaluate to `false`.
 More complex expressions can be also assigned
 
 `(let x (* 3 6))`
+
+#### Conditional expressions
+
+If expression contains three parts, and it must contain them every time.
+Else part is mandatory.
+
+- Condition - any expression which evaluates to BOOLEAN type.
+  Expressions which evaluate to any other type will result in an error.
+- Then expression - when the condition is true (4 in the following example)
+- Else expression - when the condition is false (3 in the following example)
+
+`(if (> 4 3) 4 3)`
