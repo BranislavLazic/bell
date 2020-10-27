@@ -98,6 +98,12 @@ func (p *Parser) parseExpression() ast.Expression {
 	case token.EndExpression:
 		p.nextToken()
 		expr = p.parseExpression()
+	case token.StartParamList:
+		p.nextToken()
+		expr = p.parseExpression()
+	case token.EndParamList:
+		p.nextToken()
+		break
 	case token.EOL:
 		p.nextToken()
 		expr = p.parseExpression()
@@ -124,7 +130,10 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 	isNotOperation := tok.Type == token.NOT && leadingExpr != nil
 	if isNotOperation && p.peekToken.Type != token.EndExpression {
 		p.nextToken()
-		p.Errors = append(p.Errors, "'not' operation contains more than one expression or lacks a closing parentheses.")
+		p.Errors = append(
+			p.Errors,
+			"'not' operation either contains more than one expression or lacks a closing parentheses.",
+		)
 		return nil
 	}
 	// If the prefix token is "not", one expression is present,
@@ -141,7 +150,7 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 	// Parse expressions until '(' is the next token.
 	for p.peekToken.Type != token.EndExpression {
 		if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
-			break
+			return nil
 		}
 		exprs = append(exprs, p.parseExpression())
 	}
@@ -193,7 +202,28 @@ func (p *Parser) parseLetExpression() ast.Expression {
 		return nil
 	}
 	ident := p.parseIdentifier()
+	var params []*ast.Identifier
+	isFunction := false
+	if p.peekToken.Type == token.StartParamList {
+		isFunction = true
+		for p.curToken.Type != token.EndParamList {
+			if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
+				return nil
+			}
+			switch ex := p.parseExpression().(type) {
+			// Collect only identifiers
+			case *ast.Identifier:
+				params = append(params, ex)
+			default:
+				break
+			}
+		}
+	}
 	expr := p.parseExpression()
+	if expr == nil {
+		p.Errors = append(p.Errors, fmt.Sprintf("Missing assigned expression."))
+		return nil
+	}
 	// Check whether the expression is closed.
 	// If not, then anything following the expression is
 	// an illegal token except of EOF (which gives Unexpected EOF error).
@@ -207,7 +237,10 @@ func (p *Parser) parseLetExpression() ast.Expression {
 		}
 	}
 	p.nextToken()
-	return &ast.LetExpression{Token: letTok, Identifier: ident, Expr: expr}
+	if isFunction {
+		return &ast.Function{Token: letTok, Identifier: ident.(*ast.Identifier), Params: params, Body: expr}
+	}
+	return &ast.LetExpression{Token: letTok, Identifier: ident.(*ast.Identifier), Expr: expr}
 }
 
 func (p *Parser) parseIfExpression() ast.Expression {
@@ -241,7 +274,23 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	return &ast.IfExpression{Token: ifTok, Condition: cond, ThenExpr: expr, ElseExpr: elseExpr}
 }
 
-func (p *Parser) parseIdentifier() *ast.Identifier {
+func (p *Parser) parseIdentifier() ast.Expression {
+	// If an identifier is at the beginning of an
+	// expression, then the expression is treated
+	// as a function call.
+	if p.curToken.Type == token.StartExpression {
+		p.nextToken()
+		ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		var args []ast.Expression
+		for p.peekToken.Type != token.EndExpression {
+			if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
+				break
+			}
+			args = append(args, p.parseExpression())
+		}
+		p.nextToken()
+		return &ast.CallFunction{Identifier: ident, Args: args}
+	}
 	p.nextToken()
 	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }

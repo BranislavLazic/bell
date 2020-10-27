@@ -53,6 +53,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.StartExpression, l.ch)
 	case ')':
 		tok = newToken(token.EndExpression, l.ch)
+	case '[':
+		tok = newToken(token.StartParamList, l.ch)
+	case ']':
+		tok = newToken(token.EndParamList, l.ch)
 	case '\n':
 		tok.Literal = ""
 		tok.Type = token.EOL

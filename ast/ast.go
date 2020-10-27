@@ -284,7 +284,46 @@ func (ie *IfExpression) TokenLiteral() string {
 	return ie.Token.Literal
 }
 func (ie *IfExpression) String() string {
-	return fmt.Sprintf("(if %s %s %s)", ie.Condition, ie.ThenExpr, ie.ElseExpr)
+	return fmt.Sprintf(
+		"(if %s %s %s)",
+		ie.Condition.String(), ie.ThenExpr.String(), ie.ElseExpr.String(),
+	)
+}
+
+type Function struct {
+	Token      token.Token // let keyword
+	Identifier *Identifier
+	Params     []*Identifier
+	Body       Expression
+}
+
+func (fn *Function) TokenLiteral() string {
+	return fn.Token.Literal
+}
+func (fn *Function) String() string {
+	var idents []string
+	for _, ident := range fn.Params {
+		idents = append(idents, ident.String())
+	}
+	identsStr := strings.Join(idents, " ")
+	return fmt.Sprintf("(let %s [%s] %s)", fn.Identifier.String(), identsStr, fn.Body.String())
+}
+
+type CallFunction struct {
+	Identifier *Identifier
+	Args       []Expression
+}
+
+func (cf *CallFunction) TokenLiteral() string {
+	return cf.Identifier.String()
+}
+func (cf *CallFunction) String() string {
+	var args []string
+	for _, arg := range cf.Args {
+		args = append(args, arg.String())
+	}
+	argsStr := strings.Join(args, " ")
+	return fmt.Sprintf("(%s %s)", cf.Identifier.String(), argsStr)
 }
 
 func concatExprsAsString(exprs []Expression) string {

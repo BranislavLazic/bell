@@ -63,7 +63,7 @@ On the other hand, logical operations can only accept booleans. Expression: `(an
 Relational operations produce boolean values and can be mixed with logical operations.
 Expression `(and true (> 4 5))` will evaluate to `false`.
 
-#### Assignment
+#### Value assignment
 
 `(let x 3)`
 
@@ -88,3 +88,14 @@ Else part is mandatory.
 - Else expression - when the condition is false (3 in the following example)
 
 `(if (> 4 3) 4 3)`
+
+#### Function assignment
+
+Similarly to value assignment, `let` keyword is being used for a function assignment.
+Function contains a name, list of parameters (it can be empty) and a body.
+
+`(let double [number] (* number 2))`
+
+To call the function:
+
+`(double 6)` which will produce `12`.

@@ -49,6 +49,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIdentifier(node, env)
 	case *ast.ListExpression:
 		return evalListExpression(node, env)
+	case *ast.Function:
+		return evalFunctionExpression(node, env)
+	case *ast.CallFunction:
+		return evalCallFunctionExpression(node, env)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
@@ -233,6 +237,40 @@ func evalLetExpression(letExpr *ast.LetExpression, env *object.Environment) obje
 	val := Eval(letExpr.Expr, env)
 	env.Set(ident, val)
 	return val
+}
+
+func evalFunctionExpression(f *ast.Function, env *object.Environment) object.Object {
+	ident := f.Identifier.String()
+	fn := &object.Function{Identifier: f.Identifier, Params: f.Params, Body: f.Body}
+	env.Set(ident, fn)
+	return fn
+}
+
+func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) object.Object {
+	val, ok := env.Get(cf.Identifier.String())
+	if !ok {
+		return &object.Nil{}
+	}
+	switch fn := val.(type) {
+	case *object.Function:
+		paramsCount := len(fn.Params)
+		argsCount := len(cf.Args)
+		if argsCount > paramsCount {
+			return &object.RuntimeError{
+				Error: fmt.Sprintf("Too many arguments. Expected %d, got %d.", paramsCount, argsCount),
+			}
+		}
+		if argsCount < paramsCount {
+			return &object.RuntimeError{
+				Error: fmt.Sprintf("Insufficient number of arguments. Expected %d, got %d.", paramsCount, argsCount),
+			}
+		}
+		for idx, param := range fn.Params {
+			env.Set(param.Value, Eval(cf.Args[idx], env))
+		}
+		return Eval(fn.Body, env)
+	}
+	return &object.Nil{}
 }
 
 func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.Object {

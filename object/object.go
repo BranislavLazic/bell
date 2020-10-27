@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+	"github.com/branislavlazic/bell/ast"
 	"strings"
 )
 
@@ -11,6 +12,7 @@ const (
 	IntegerObj      = "INTEGER"
 	BooleanObj      = "BOOLEAN"
 	ListObj         = "LIST"
+	FunctionObj     = "FUNCTION"
 	NilObj          = "NIL"
 	RuntimeErrorObj = "RUNTIME_ERROR"
 )
@@ -55,6 +57,27 @@ func (l *List) Inspect() string {
 		exprsAsStrArr = append(exprsAsStrArr, obj.Inspect())
 	}
 	return strings.Join(exprsAsStrArr, " ")
+}
+
+type Function struct {
+	Identifier *ast.Identifier
+	Params     []*ast.Identifier
+	Body       ast.Expression
+}
+
+func (f *Function) Type() ObjectType {
+	return FunctionObj
+}
+func (f *Function) Inspect() string {
+	var params []string
+	for _, obj := range f.Params {
+		params = append(params, obj.String())
+	}
+	joinedParams := strings.Join(params, " ")
+	if params != nil {
+		return fmt.Sprintf("(%s %s)", f.Identifier.String(), joinedParams)
+	}
+	return fmt.Sprintf("(%s)", f.Identifier.String())
 }
 
 type RuntimeError struct {

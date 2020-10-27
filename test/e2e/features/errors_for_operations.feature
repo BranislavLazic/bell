@@ -48,7 +48,7 @@ Feature: Errors for operations
       """
     Then the error is
       """
-      'not' operation contains more than one expression or lacks a closing parentheses.
+      'not' operation either contains more than one expression or lacks a closing parentheses.
       """
 
 

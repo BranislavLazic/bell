@@ -16,6 +16,8 @@ const (
 	IF              = "IF"
 	LIST            = "LIST"
 	IDENT           = "IDENT"
+	StartParamList  = "START_PARAM_LIST"
+	EndParamList    = "END_PARAM_LIST"
 	EOF             = "EOF"
 	EOL             = "EOL"
 	ILLEGAL         = "ILLEGAL"
@@ -60,4 +62,5 @@ var OperatorLiterals = []string{
 	"*", "-", "/",
 	"=", "not=", "and",
 	"or", ">", ">=",
-	"<", "<=", "not", "list", "if"}
+	"<", "<=", "not",
+	"list", "if"}
