@@ -206,35 +206,22 @@ func (p *Parser) parseLetExpression() ast.Expression {
 	isFunction := false
 	if p.peekToken.Type == token.StartParamList {
 		isFunction = true
-		for p.curToken.Type != token.EndParamList {
-			if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
-				return nil
-			}
-			switch ex := p.parseExpression().(type) {
-			// Collect only identifiers
-			case *ast.Identifier:
-				params = append(params, ex)
-			default:
-				break
-			}
+		prms, ok := p.parseParams()
+		if !ok {
+			return nil
 		}
+		params = prms
 	}
 	expr := p.parseExpression()
 	if expr == nil {
-		p.Errors = append(p.Errors, fmt.Sprintf("Missing assigned expression."))
+		p.Errors = append(p.Errors, fmt.Sprintf("Missing an expression for assignment."))
 		return nil
 	}
 	// Check whether the expression is closed.
 	// If not, then anything following the expression is
 	// an illegal token except of EOF (which gives Unexpected EOF error).
-	if p.peekToken.Type != token.EndExpression {
-		if !p.isPeekEOF() {
-			p.Errors = append(
-				p.Errors,
-				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
-			)
-			return nil
-		}
+	if !p.isPeekEndExpression() {
+		return nil
 	}
 	p.nextToken()
 	if isFunction {
@@ -272,6 +259,30 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	}
 	p.nextToken()
 	return &ast.IfExpression{Token: ifTok, Condition: cond, ThenExpr: expr, ElseExpr: elseExpr}
+}
+
+func (p *Parser) parseParams() ([]*ast.Identifier, bool) {
+	var params []*ast.Identifier
+	p.nextToken()
+	for p.curToken.Type != token.EndParamList {
+		if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
+			return nil, false
+		}
+		// Expect only identifiers in the list of parameters
+		switch p.peekToken.Type {
+		case token.IDENT:
+			params = append(params, p.parseIdentifier().(*ast.Identifier))
+		case token.EndParamList:
+			p.nextToken()
+		default:
+			p.Errors = append(
+				p.Errors,
+				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+			)
+			return nil, false
+		}
+	}
+	return params, true
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
@@ -342,4 +353,17 @@ func (p *Parser) isPeekOperator() bool {
 		}
 	}
 	return false
+}
+
+func (p *Parser) isPeekEndExpression() bool {
+	if p.peekToken.Type != token.EndExpression {
+		if !p.isPeekEOF() {
+			p.Errors = append(
+				p.Errors,
+				fmt.Sprintf("Illegal character '%s' found at index %d.", p.peekToken.Literal, p.lxr.Position-1),
+			)
+			return false
+		}
+	}
+	return true
 }

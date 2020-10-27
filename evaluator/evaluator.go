@@ -247,9 +247,10 @@ func evalFunctionExpression(f *ast.Function, env *object.Environment) object.Obj
 }
 
 func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) object.Object {
-	val, ok := env.Get(cf.Identifier.String())
+	fnName := cf.Identifier.String()
+	val, ok := env.Get(fnName)
 	if !ok {
-		return &object.Nil{}
+		return &object.RuntimeError{Error: fmt.Sprintf("Function %s is undefined", fnName)}
 	}
 	switch fn := val.(type) {
 	case *object.Function:
@@ -270,7 +271,7 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 		}
 		return Eval(fn.Body, env)
 	}
-	return &object.Nil{}
+	return val
 }
 
 func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.Object {
