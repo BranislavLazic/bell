@@ -108,3 +108,38 @@ Feature: Let expression
       """
       35
       """
+
+  Scenario: It should evaluate and support higher order functions
+    Given the program
+      """
+      (let map [arg func] (func arg))
+      (map 10 (let a [a] (* a 2)))
+      """
+    Then the result is
+      """
+      20
+      """
+
+  Scenario: It should evaluate and use a variable from the inner scope
+    Given the program
+      """
+      (let x 3)
+      (let map [a] (let x 5) (+ a x))
+      (map 2)
+      """
+    Then the result is
+      """
+      7
+      """
+
+  Scenario: It should evaluate and use a variable from the outer scope
+    Given the program
+      """
+      (let x 3)
+      (let map [a] (+ a x))
+      (map 2)
+      """
+    Then the result is
+      """
+      5
+      """

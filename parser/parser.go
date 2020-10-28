@@ -147,13 +147,11 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 		return nil
 	}
 	exprs = append(exprs, leadingExpr)
-	// Parse expressions until '(' is the next token.
-	for p.peekToken.Type != token.EndExpression {
-		if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
-			return nil
-		}
-		exprs = append(exprs, p.parseExpression())
+	ex, ok := p.collectExpressions()
+	if !ok {
+		return nil
 	}
+	exprs = append(exprs, ex...)
 	p.nextToken()
 	// If the prefix token is "-", one expression is present,
 	// then it's a negated expression.
@@ -212,8 +210,11 @@ func (p *Parser) parseLetExpression() ast.Expression {
 		}
 		params = prms
 	}
-	expr := p.parseExpression()
-	if expr == nil {
+	exprs, ok := p.collectExpressions()
+	if !ok {
+		return nil
+	}
+	if exprs == nil {
 		p.Errors = append(p.Errors, fmt.Sprintf("Missing an expression for assignment."))
 		return nil
 	}
@@ -225,9 +226,9 @@ func (p *Parser) parseLetExpression() ast.Expression {
 	}
 	p.nextToken()
 	if isFunction {
-		return &ast.Function{Token: letTok, Identifier: ident.(*ast.Identifier), Params: params, Body: expr}
+		return &ast.Function{Token: letTok, Identifier: ident.(*ast.Identifier), Params: params, Body: exprs}
 	}
-	return &ast.LetExpression{Token: letTok, Identifier: ident.(*ast.Identifier), Expr: expr}
+	return &ast.LetExpression{Token: letTok, Identifier: ident.(*ast.Identifier), Exprs: exprs}
 }
 
 func (p *Parser) parseIfExpression() ast.Expression {
@@ -322,6 +323,18 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		p.Errors = append(p.Errors, "Failed to parse a value to bool.")
 	}
 	return &ast.BooleanLiteral{Token: p.curToken, Value: value}
+}
+
+func (p *Parser) collectExpressions() ([]ast.Expression, bool) {
+	var exprs []ast.Expression
+	// Parse expressions until '(' is the next token.
+	for p.peekToken.Type != token.EndExpression {
+		if p.isPeekEOF() || p.isPeekIllegal() || p.isPeekOperator() {
+			return nil, false
+		}
+		exprs = append(exprs, p.parseExpression())
+	}
+	return exprs, true
 }
 
 func (p *Parser) nextToken() {

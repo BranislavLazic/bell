@@ -251,14 +251,14 @@ func (i *Identifier) String() string {
 type LetExpression struct {
 	Token      token.Token // "let" keyword
 	Identifier *Identifier
-	Expr       Expression // Single expression following
+	Exprs      []Expression
 }
 
 func (le *LetExpression) TokenLiteral() string {
 	return le.Token.Literal
 }
 func (le *LetExpression) String() string {
-	return fmt.Sprintf("(let %s %s)", le.Identifier.String(), le.Expr.String())
+	return fmt.Sprintf("(let %s %s)", le.Identifier.String(), concatExprsAsString(le.Exprs))
 }
 
 type ListExpression struct {
@@ -294,7 +294,7 @@ type Function struct {
 	Token      token.Token // let keyword
 	Identifier *Identifier
 	Params     []*Identifier
-	Body       Expression
+	Body       []Expression
 }
 
 func (fn *Function) TokenLiteral() string {
@@ -306,7 +306,7 @@ func (fn *Function) String() string {
 		idents = append(idents, ident.String())
 	}
 	identsStr := strings.Join(idents, " ")
-	return fmt.Sprintf("(let %s [%s] %s)", fn.Identifier.String(), identsStr, fn.Body.String())
+	return fmt.Sprintf("(let %s [%s] %s)", fn.Identifier.String(), identsStr, concatExprsAsString(fn.Body))
 }
 
 type CallFunction struct {

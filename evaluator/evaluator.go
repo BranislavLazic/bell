@@ -234,7 +234,7 @@ func evalNotExpression(value object.Object) object.Object {
 
 func evalLetExpression(letExpr *ast.LetExpression, env *object.Environment) object.Object {
 	ident := letExpr.Identifier.String()
-	val := Eval(letExpr.Expr, env)
+	val := evalExpressions(letExpr.Exprs, env)
 	env.Set(ident, val)
 	return val
 }
@@ -266,10 +266,11 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 				Error: fmt.Sprintf("Insufficient number of arguments. Expected %d, got %d.", paramsCount, argsCount),
 			}
 		}
+		innerEnv := object.NewInnerEnvironment(env)
 		for idx, param := range fn.Params {
-			env.Set(param.Value, Eval(cf.Args[idx], env))
+			innerEnv.Set(param.Value, Eval(cf.Args[idx], innerEnv))
 		}
-		return Eval(fn.Body, env)
+		return evalExpressions(fn.Body, innerEnv)
 	}
 	return val
 }

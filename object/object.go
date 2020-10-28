@@ -62,7 +62,7 @@ func (l *List) Inspect() string {
 type Function struct {
 	Identifier *ast.Identifier
 	Params     []*ast.Identifier
-	Body       ast.Expression
+	Body       []ast.Expression
 }
 
 func (f *Function) Type() ObjectType {

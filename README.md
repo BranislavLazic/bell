@@ -99,3 +99,14 @@ Function contains a name, list of parameters (it can be empty) and a body.
 To call the function:
 
 `(double 6)` which will produce `12`.
+
+Higher order functions are also supported. Which means that we can pass a function
+as an argument:
+
+`(let map [arg func] (func arg))`
+
+Call the function with a function as the argument
+
+`(map 10 (let _ [a] (* a 2)))`
+
+Gives: 20.

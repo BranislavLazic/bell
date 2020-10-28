@@ -13,8 +13,8 @@ import (
 )
 
 const textPrompt = ">> "
-const inputForegroundColor = "120"
-const outputForegroundColor = "214"
+const inputForegroundColor = "147"
+const outputForegroundColor = "42"
 
 type model struct {
 	textInput   input.Model
@@ -45,7 +45,6 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
@@ -73,13 +72,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
-
 	m.textInput, cmd = input.Update(msg, m.textInput)
 	return m, cmd
-}
-
-func outputEvalResult(currentRes string, textInputValue string, evalRes string) string {
-	return fmt.Sprintf("%s\n%s\n%s\n", currentRes, textInputValue, evalRes)
 }
 
 func (m model) View() string {
@@ -90,6 +84,10 @@ func (m model) View() string {
 		input.View(m.textInput),
 	)
 	return te.String(output).Foreground(color(outputForegroundColor)).String()
+}
+
+func outputEvalResult(currentRes string, textInputValue string, evalRes string) string {
+	return fmt.Sprintf("%s\n>> %s\n%s\n", currentRes, textInputValue, evalRes)
 }
 
 func (m *model) execCommand(cmd string) bool {
