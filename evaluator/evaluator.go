@@ -152,6 +152,9 @@ func evalEqualForAll(exprType ast.Node, exprs []ast.Expression, env *object.Envi
 				}
 			case evalExpr.Type() == object.NilObj && accumResult.Type() == object.NilObj:
 				continue
+			case evalExpr.Type() == object.NilObj && accumResult.Type() != object.NilObj ||
+				evalExpr.Type() != object.NilObj && accumResult.Type() == object.NilObj:
+				return &object.Boolean{Value: false}
 			default:
 				return &object.RuntimeError{
 					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
