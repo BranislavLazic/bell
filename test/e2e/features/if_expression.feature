@@ -53,7 +53,7 @@ Feature: If expression
     Given the program
       """
       (let x 3)
-      (if (not true) (+ 6 7) x))
+      (if (not true) (+ 6 7) x)
       """
     Then the result is
       """
@@ -69,6 +69,26 @@ Feature: If expression
     Then the result is
       """
       4
+      """
+
+  Scenario: It should evaluate if "else" expression is missing
+    Given the program
+      """
+      (if true 4)
+      """
+    Then the result is
+      """
+      4
+      """
+
+  Scenario: It should evaluate to nil if "else" expression is missing and condition evaluates to false
+    Given the program
+      """
+      (if (> 3 4)  4)
+      """
+    Then the result is
+      """
+      nil
       """
 
   Scenario: It should not evaluate if condition is missing
@@ -89,14 +109,4 @@ Feature: If expression
     Then the error is
       """
       If expression is missing then expression.
-      """
-
-  Scenario: It should not evaluate if "else" expression is missing
-    Given the program
-      """
-      (if true 4)
-      """
-    Then the error is
-      """
-      If expression is missing else expression.
       """

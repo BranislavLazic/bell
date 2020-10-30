@@ -98,12 +98,6 @@ func (p *Parser) parseExpression() ast.Expression {
 	case token.EndExpression:
 		p.nextToken()
 		expr = p.parseExpression()
-	case token.StartParamList:
-		p.nextToken()
-		expr = p.parseExpression()
-	case token.EndParamList:
-		p.nextToken()
-		break
 	case token.EOL:
 		p.nextToken()
 		expr = p.parseExpression()
@@ -204,6 +198,7 @@ func (p *Parser) parseLetExpression() ast.Expression {
 	isFunction := false
 	if p.peekToken.Type == token.StartParamList {
 		isFunction = true
+		// Collect expressions within '[]'
 		prms, ok := p.parseParams()
 		if !ok {
 			return nil
@@ -244,12 +239,11 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		p.Errors = append(p.Errors, fmt.Sprintf("If expression is missing then expression."))
 		return nil
 	}
-	elseExpr := p.parseExpression()
-	if elseExpr == nil {
-		p.Errors = append(p.Errors, fmt.Sprintf("If expression is missing else expression."))
-		return nil
-	}
+	var elseExpr ast.Expression
 	if p.peekToken.Type != token.EndExpression {
+		elseExpr = p.parseExpression()
+	}
+	if p.peekToken.Type != token.EndExpression && elseExpr != nil {
 		if !p.isPeekEOF() {
 			p.Errors = append(
 				p.Errors,

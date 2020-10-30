@@ -143,3 +143,14 @@ Feature: Let expression
       """
       5
       """
+
+  Scenario: It should evaluate with if expression
+    Given the program
+      """
+      (let calc [x y] (if (> x y) x))
+      (calc 4 3)
+      """
+    Then the result is
+      """
+      4
+      """

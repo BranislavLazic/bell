@@ -282,7 +282,10 @@ func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.
 		if cnd.Value {
 			return Eval(ifExpr.ThenExpr, env)
 		}
-		return Eval(ifExpr.ElseExpr, env)
+		if ifExpr.ElseExpr != nil {
+			return Eval(ifExpr.ElseExpr, env)
+		}
+		return &object.Nil{}
 	}
 	return &object.RuntimeError{
 		Error: fmt.Sprintf("Condition for if expression should evaluate to BOOLEAN type. Found %s type.", cond.Type()),

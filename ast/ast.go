@@ -284,9 +284,15 @@ func (ie *IfExpression) TokenLiteral() string {
 	return ie.Token.Literal
 }
 func (ie *IfExpression) String() string {
+	if ie.ElseExpr != nil {
+		return fmt.Sprintf(
+			"(if %s %s %s)",
+			ie.Condition.String(), ie.ThenExpr.String(), ie.ElseExpr.String(),
+		)
+	}
 	return fmt.Sprintf(
-		"(if %s %s %s)",
-		ie.Condition.String(), ie.ThenExpr.String(), ie.ElseExpr.String(),
+		"(if %s %s)",
+		ie.Condition.String(), ie.ThenExpr.String(),
 	)
 }
 

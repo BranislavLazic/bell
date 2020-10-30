@@ -79,13 +79,12 @@ More complex expressions can be also assigned
 
 #### Conditional expressions
 
-If expression contains three parts, and it must contain them every time.
-Else part is mandatory.
+If expression contains three parts.
 
 - Condition - any expression which evaluates to BOOLEAN type.
   Expressions which evaluate to any other type will result in an error.
 - Then expression - when the condition is true (4 in the following example)
-- Else expression - when the condition is false (3 in the following example)
+- Optional, else expression - when the condition is false (3 in the following example)
 
 `(if (> 4 3) 4 3)`
 
