@@ -1,4 +1,4 @@
-package repl
+package main
 
 import (
 	"fmt"
@@ -110,7 +110,8 @@ func (m *model) execCommand(cmd string) bool {
 	return false
 }
 
-func Start() {
+func main() {
+	fmt.Println("Welcome to Bell REPL!")
 	fmt.Println("(Type :help to show of commands)")
 	p := tea.NewProgram(initialModel())
 	if err := p.Start(); err != nil {

@@ -7,6 +7,8 @@ import (
 	"github.com/branislavlazic/bell/object"
 )
 
+var SysOut []object.Object
+
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -53,10 +55,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalFunctionExpression(node, env)
 	case *ast.CallFunction:
 		return evalCallFunctionExpression(node, env)
+	case *ast.WriteLnExpression:
+		return evalWriteLnExpression(node, env)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
 		return &object.Boolean{Value: node.Value}
+	case *ast.NilExpression:
+		return &object.Nil{}
 	default:
 		return &object.Nil{}
 	}
@@ -144,6 +150,8 @@ func evalEqualForAll(exprType ast.Node, exprs []ast.Expression, env *object.Envi
 				if accumResult.(*object.Boolean).Value != evalExpr.(*object.Boolean).Value {
 					return &object.Boolean{Value: false}
 				}
+			case evalExpr.Type() == object.NilObj && accumResult.Type() == object.NilObj:
+				continue
 			default:
 				return &object.RuntimeError{
 					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
@@ -280,9 +288,10 @@ func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.
 	switch cnd := cond.(type) {
 	case *object.Boolean:
 		if cnd.Value {
-			return Eval(ifExpr.ThenExpr, env)
+			eval := Eval(ifExpr.ThenExpr, env)
+			return eval
 		}
-		if ifExpr.ElseExpr != nil {
+		if ifExpr.ElseExpr != nil && !cnd.Value {
 			return Eval(ifExpr.ElseExpr, env)
 		}
 		return &object.Nil{}
@@ -307,6 +316,15 @@ func evalIdentifier(ident *ast.Identifier, env *object.Environment) object.Objec
 		return &object.Nil{}
 	}
 	return val
+}
+
+func evalWriteLnExpression(writeLnExpr *ast.WriteLnExpression, env *object.Environment) object.Object {
+	var evaluatedExpr object.Object
+	for _, expr := range writeLnExpr.Exprs {
+		evaluatedExpr = Eval(expr, env)
+		SysOut = append(SysOut, evaluatedExpr)
+	}
+	return &object.Nil{}
 }
 
 func evalExpressions(exprs []ast.Expression, env *object.Environment) object.Object {

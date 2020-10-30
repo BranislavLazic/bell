@@ -332,6 +332,29 @@ func (cf *CallFunction) String() string {
 	return fmt.Sprintf("(%s %s)", cf.Identifier.String(), argsStr)
 }
 
+type WriteLnExpression struct {
+	Token token.Token // writeln keyword
+	Exprs []Expression
+}
+
+func (wle *WriteLnExpression) TokenLiteral() string {
+	return wle.Token.Literal
+}
+func (wle *WriteLnExpression) String() string {
+	return fmt.Sprintf("(writeln %s)", concatExprsAsString(wle.Exprs))
+}
+
+type NilExpression struct {
+	Token token.Token // nil keyword
+}
+
+func (ne *NilExpression) TokenLiteral() string {
+	return ne.Token.Literal
+}
+func (ne *NilExpression) String() string {
+	return ne.Token.Literal
+}
+
 func concatExprsAsString(exprs []Expression) string {
 	var exprsAsStrArr []string
 	for _, expr := range exprs {

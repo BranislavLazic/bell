@@ -86,6 +86,10 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseIfExpression()
 	case token.LIST:
 		expr = p.parseOperationExpression()
+	case token.WRITELN:
+		expr = p.parseWriteLnExpression()
+	case token.NIL:
+		expr = p.parseNil()
 	case token.IDENT:
 		expr = p.parseIdentifier()
 	case token.BOOL:
@@ -256,6 +260,17 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	return &ast.IfExpression{Token: ifTok, Condition: cond, ThenExpr: expr, ElseExpr: elseExpr}
 }
 
+func (p *Parser) parseWriteLnExpression() *ast.WriteLnExpression {
+	p.nextToken()
+	writelnTok := p.curToken
+	exprs, ok := p.collectExpressions()
+	if !ok {
+		return nil
+	}
+	p.nextToken()
+	return &ast.WriteLnExpression{Token: writelnTok, Exprs: exprs}
+}
+
 func (p *Parser) parseParams() ([]*ast.Identifier, bool) {
 	var params []*ast.Identifier
 	p.nextToken()
@@ -317,6 +332,11 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		p.Errors = append(p.Errors, "Failed to parse a value to bool.")
 	}
 	return &ast.BooleanLiteral{Token: p.curToken, Value: value}
+}
+
+func (p *Parser) parseNil() *ast.NilExpression {
+	p.nextToken()
+	return &ast.NilExpression{Token: p.curToken}
 }
 
 func (p *Parser) collectExpressions() ([]ast.Expression, bool) {

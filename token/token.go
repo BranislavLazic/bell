@@ -15,7 +15,9 @@ const (
 	LET             = "LET"
 	IF              = "IF"
 	LIST            = "LIST"
+	WRITELN         = "WRITELN"
 	IDENT           = "IDENT"
+	NIL             = "NIL"
 	StartParamList  = "START_PARAM_LIST"
 	EndParamList    = "END_PARAM_LIST"
 	EOF             = "EOF"
@@ -39,15 +41,17 @@ const (
 )
 
 var keywords = map[string]TokType{
-	"true":  BOOL,
-	"false": BOOL,
-	"and":   AND,
-	"or":    OR,
-	"not":   NOT,
-	"not=":  NotEqual,
-	"let":   LET,
-	"if":    IF,
-	"list":  LIST,
+	"true":    BOOL,
+	"false":   BOOL,
+	"and":     AND,
+	"or":      OR,
+	"not":     NOT,
+	"not=":    NotEqual,
+	"let":     LET,
+	"if":      IF,
+	"list":    LIST,
+	"writeln": WRITELN,
+	"nil":     NIL,
 }
 
 func LookupKeyword(instruction string) TokType {
@@ -63,4 +67,4 @@ var OperatorLiterals = []string{
 	"=", "not=", "and",
 	"or", ">", ">=",
 	"<", "<=", "not",
-	"list", "if"}
+	"list", "if", "writeln"}
