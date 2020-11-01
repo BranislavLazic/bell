@@ -19,6 +19,9 @@ var builtins = map[string]*object.Builtin{
 				return arg.Objects[0]
 			case *object.String:
 				arr := []rune(arg.Value)
+				if len(arr) == 0 {
+					return &object.String{Value: ""}
+				}
 				return &object.String{Value: string(arr[0])}
 			default:
 				return &object.RuntimeError{Error: fmt.Sprintf("Function is not applicable for %s type.", arg.Type())}
@@ -42,6 +45,9 @@ var builtins = map[string]*object.Builtin{
 				return &object.List{Objects: objects}
 			case *object.String:
 				arr := []rune(arg.Value)
+				if len(arr) == 0 {
+					return &object.String{Value: ""}
+				}
 				return &object.String{Value: string(arr[1:])}
 			default:
 				return &object.RuntimeError{Error: fmt.Sprintf("Function is not applicable for %s type.", arg.Type())}

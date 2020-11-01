@@ -15,6 +15,17 @@ Example of area calculation
 (writeln (area 3 4))
 ```
 
+Reverse word:
+
+```
+(let reverse [word]
+    if((> (size word) 0)
+        (+ (reverse (tail word)) (head word))
+        ""))
+
+(writeln (reverse "hello"))
+```
+
 #### Arithmetic operators
 
 | Operator | Description                                                   | Example                      |

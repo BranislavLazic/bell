@@ -79,6 +79,15 @@ Feature: String expressions
       b
       """
 
+  Scenario: It should return and empty value when 'head' is applied for an empty string
+    Given the program
+      """
+      (head "")
+      """
+    Then the result is
+      """
+      """
+
   Scenario: It should return a "tail" of a string by using 'tail' function
     Given the program
       """
@@ -87,4 +96,13 @@ Feature: String expressions
     Then the result is
       """
       rown fox
+      """
+
+  Scenario: It should return and empty value when 'tail' is applied for an empty string
+    Given the program
+      """
+      (tail "")
+      """
+    Then the result is
+      """
       """
