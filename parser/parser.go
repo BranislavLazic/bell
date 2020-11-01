@@ -86,6 +86,8 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.parseIfExpression()
 	case token.LIST:
 		expr = p.parseOperationExpression()
+	case token.STRING:
+		expr = p.parseStringLiteral()
 	case token.WRITELN:
 		expr = p.parseWriteLnExpression()
 	case token.NIL:
@@ -332,6 +334,11 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 		p.Errors = append(p.Errors, "Failed to parse a value to bool.")
 	}
 	return &ast.BooleanLiteral{Token: p.curToken, Value: value}
+}
+
+func (p *Parser) parseStringLiteral() *ast.StringLiteral {
+	p.nextToken()
+	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 func (p *Parser) parseNil() *ast.NilExpression {

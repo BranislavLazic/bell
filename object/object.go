@@ -11,6 +11,7 @@ type ObjectType string
 const (
 	IntegerObj      = "INTEGER"
 	BooleanObj      = "BOOLEAN"
+	StringObj       = "STRING"
 	ListObj         = "LIST"
 	FunctionObj     = "FUNCTION"
 	NilObj          = "NIL"
@@ -43,6 +44,17 @@ func (b *Boolean) Type() ObjectType {
 }
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType {
+	return StringObj
+}
+func (s *String) Inspect() string {
+	return fmt.Sprintf("%s", s.Value)
 }
 
 type List struct {

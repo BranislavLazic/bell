@@ -61,6 +61,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
 		return &object.Boolean{Value: node.Value}
+	case *ast.StringLiteral:
+		return &object.String{Value: node.Value}
 	case *ast.NilExpression:
 		return &object.Nil{}
 	default:
@@ -84,6 +86,10 @@ func evalExpression(exprType ast.Node, exprs []ast.Expression, env *object.Envir
 			case evalExpr.Type() == object.BooleanObj && accumResult.Type() == object.BooleanObj:
 				nextValue := evalExpr.(*object.Boolean)
 				accumResult = evalLogicalOperation(exprType, accumResult.(*object.Boolean), nextValue)
+			// If either evaluated expression or accumulation result is a string
+			// then perform string concatenation
+			case evalExpr.Type() == object.StringObj || accumResult.Type() == object.StringObj:
+				accumResult = evalStringOperation(exprType, accumResult, evalExpr)
 			default:
 				return &object.RuntimeError{
 					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",
@@ -115,7 +121,9 @@ func evalArithmeticOperation(exprType ast.Node, left *object.Integer, right *obj
 	case *ast.NotEqualExpression:
 		return &object.Boolean{Value: left.Value != right.Value}
 	default:
-		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for INTEGER types.", exprType.String())}
+		return &object.RuntimeError{
+			Error: fmt.Sprintf("Non-existing operation %s for INTEGER types.", exprType.String()),
+		}
 	}
 }
 
@@ -131,6 +139,15 @@ func evalLogicalOperation(exprType ast.Node, left *object.Boolean, right *object
 		return &object.Boolean{Value: left.Value != right.Value}
 	default:
 		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for BOOLEAN types.", exprType.String())}
+	}
+}
+
+func evalStringOperation(exprType ast.Node, left object.Object, right object.Object) object.Object {
+	switch exprType.(type) {
+	case *ast.AddExpression:
+		return &object.String{Value: left.Inspect() + right.Inspect()}
+	default:
+		return &object.RuntimeError{Error: fmt.Sprintf("Non-existing operation %s for STRING types.", exprType.String())}
 	}
 }
 
@@ -176,7 +193,8 @@ func evalNotEqualForAll(exprType ast.Node, exprs []ast.Expression, env *object.E
 	}
 }
 
-func evalComparison(exprType ast.Node, exprs []ast.Expression, env *object.Environment, comparator func(left int64, right int64) bool) object.Object {
+func evalComparison(exprType ast.Node, exprs []ast.Expression, env *object.Environment,
+	comparator func(left int64, right int64) bool) object.Object {
 	var accumResult object.Object
 	for _, expr := range exprs {
 		evalExpr := Eval(expr, env)

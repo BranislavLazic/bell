@@ -355,6 +355,18 @@ func (ne *NilExpression) String() string {
 	return ne.Token.Literal
 }
 
+type StringLiteral struct {
+	Token token.Token // string token
+	Value string
+}
+
+func (sl *StringLiteral) TokenLiteral() string {
+	return sl.Token.Literal
+}
+func (sl *StringLiteral) String() string {
+	return sl.Value
+}
+
 func concatExprsAsString(exprs []Expression) string {
 	var exprsAsStrArr []string
 	for _, expr := range exprs {

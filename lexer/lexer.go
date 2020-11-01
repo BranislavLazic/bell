@@ -57,6 +57,9 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.StartParamList, l.ch)
 	case ']':
 		tok = newToken(token.EndParamList, l.ch)
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 	case '\n':
 		tok.Literal = ""
 		tok.Type = token.EOL
@@ -120,6 +123,17 @@ func (l *Lexer) readIdentifier() string {
 	position := l.Position
 	for isLetter(l.ch) || isAllowedFollowingIdentChar(l.ch) {
 		l.readChar()
+	}
+	return l.input[position:l.Position]
+}
+
+func (l *Lexer) readString() string {
+	position := l.Position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
 	}
 	return l.input[position:l.Position]
 }

@@ -15,6 +15,7 @@ const (
 	LET             = "LET"
 	IF              = "IF"
 	LIST            = "LIST"
+	STRING          = "STRING"
 	WRITELN         = "WRITELN"
 	IDENT           = "IDENT"
 	NIL             = "NIL"

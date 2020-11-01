@@ -54,6 +54,8 @@ Bell supports following types:
 
 - nil - a null value
 
+- strings
+
 - lists - a sequence which can contain all previous values
 
 Arithmetic operations can only accept numbers. Meaning, following expression:
@@ -112,13 +114,22 @@ Call the function with a function as the argument
 
 Gives: `20`.
 
-#####List builtin functions
+##### Builtin functions
 
-`head` - returns a first element in a list.
+`head` - returns a first element in a list or a string.
+
 Expression `(head (list 1 2 3))` will produce `1`.
 
-`tail` - returns all elements of a list except of first element.
+Expression `(head "hello")` will give `h`.
+
+`tail` - returns all elements in a list or a string except of the first element.
+
 Expression `(tail (list 1 2 3))` will produce `2 3`.
 
-`size` - returns a size of a list (count of elements).
+Expression `(tail "hello")` will produce `ello`.
+
+`size` - returns a size of a list or a length of a string.
+
 Expression `(size (list 1 2 3 4))` will produce `4`.
+
+Expression `(size "hello")` will produce `5`.
