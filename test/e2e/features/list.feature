@@ -49,6 +49,17 @@ Feature: List evaluation
       Function is not applicable for INTEGER type.
       """
 
+  Scenario: It should be able to override builtin 'head' function
+    Given the program
+      """
+      (let head [] false)
+      (head)
+      """
+    Then the result is
+      """
+      false
+      """
+
   Scenario: It should evaluate a builtin function 'tail'
     Given the program
       """

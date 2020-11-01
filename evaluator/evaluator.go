@@ -259,15 +259,17 @@ func evalFunctionExpression(f *ast.Function, env *object.Environment) object.Obj
 
 func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) object.Object {
 	fnName := cf.Identifier.String()
-	// Look for an identifier / function in the environment
-	val, ok := env.Get(fnName)
-	// Then look for an function in builtins
+	// First, look for a builtin function
 	builtin, isBuiltin := builtins[fnName]
-	// If a function is found in builtins, reassign val to a builtin
-	if isBuiltin {
+	// Then look for a function in the environment
+	// Function from the environment has a priority
+	val, ok := env.Get(fnName)
+	// If the function is not found in the environment, then use builtin
+	if !ok {
 		val = builtin
 	}
-	// In all other cases, a function is undefined
+	// In a function is not found in both builtins
+	// and in the environment, that function is undefined
 	if !ok && !isBuiltin {
 		return &object.RuntimeError{Error: fmt.Sprintf("Function %s is undefined", fnName)}
 	}
