@@ -78,3 +78,13 @@ Feature: List evaluation
       """
       30
       """
+
+  Scenario: It should evaluate a builtin function 'size' for a list
+    Given the program
+      """
+      (size (list (1 2 3 4)))
+      """
+    Then the result is
+      """
+      4
+      """

@@ -42,4 +42,20 @@ var builtins = map[string]*object.Builtin{
 			}
 		},
 	},
+	"size": {
+		Fn: func(args ...object.Object) object.Object {
+			lenArgs := len(args)
+			if lenArgs != 1 {
+				return &object.RuntimeError{
+					Error: fmt.Sprintf("Insufficient number of arguments. Expected %d, got %d.", 1, lenArgs),
+				}
+			}
+			switch arg := args[0].(type) {
+			case *object.List:
+				return &object.Integer{Value: int64(len(arg.Objects))}
+			default:
+				return &object.RuntimeError{Error: fmt.Sprintf("Function is not applicable for %s type.", arg.Type())}
+			}
+		},
+	},
 }
