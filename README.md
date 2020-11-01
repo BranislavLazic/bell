@@ -11,10 +11,8 @@ A programming language based on Lisp
 Example of area calculation
 
 ```
-(let length 5)
-(let width 4)
-
-(let area (* length width))
+(let area [length width] (* length width))
+(writeln (area 3 4))
 ```
 
 #### Arithmetic operators
@@ -53,6 +51,10 @@ Bell supports following types:
 - 64-bit signed integers
 
 - booleans - `true` or `false`
+
+- nil - a null value
+
+- lists - a sequence which can contain all previous values
 
 Arithmetic operations can only accept numbers. Meaning, following expression:
 `(+ 3 true)` will give an error `Operation (+ 3 true) cannot be performed for types: INTEGER and BOOLEAN`.
@@ -108,4 +110,14 @@ Call the function with a function as the argument
 
 `(map 10 (let _ [a] (* a 2)))`
 
-Gives: 20.
+Gives: `20`.
+
+#####List builtin functions
+
+`head` - returns a first element in a list
+
+Expression `(head (list 1 2 3))` will produce `1`.
+
+`tail` - returns all elements of a list except of first element
+
+Expression `(tail (list 1 2 3))` will produce `2 3`.

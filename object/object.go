@@ -14,6 +14,7 @@ const (
 	ListObj         = "LIST"
 	FunctionObj     = "FUNCTION"
 	NilObj          = "NIL"
+	BuiltinObj      = "BUILTIN"
 	RuntimeErrorObj = "RUNTIME_ERROR"
 )
 
@@ -98,4 +99,17 @@ func (n *Nil) Type() ObjectType {
 }
 func (n *Nil) Inspect() string {
 	return "nil"
+}
+
+type BuiltinFunction func(args ...Object) Object
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() ObjectType {
+	return BuiltinObj
+}
+func (b *Builtin) Inspect() string {
+	return "builtin"
 }

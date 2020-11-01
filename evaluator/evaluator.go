@@ -259,8 +259,16 @@ func evalFunctionExpression(f *ast.Function, env *object.Environment) object.Obj
 
 func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) object.Object {
 	fnName := cf.Identifier.String()
+	// Look for an identifier / function in the environment
 	val, ok := env.Get(fnName)
-	if !ok {
+	// Then look for an function in builtins
+	builtin, isBuiltin := builtins[fnName]
+	// If a function is found in builtins, reassign val to a builtin
+	if isBuiltin {
+		val = builtin
+	}
+	// In all other cases, a function is undefined
+	if !ok && !isBuiltin {
 		return &object.RuntimeError{Error: fmt.Sprintf("Function %s is undefined", fnName)}
 	}
 	switch fn := val.(type) {
@@ -282,6 +290,8 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 			innerEnv.Set(param.Value, Eval(cf.Args[idx], innerEnv))
 		}
 		return evalExpressions(fn.Body, innerEnv)
+	case *object.Builtin:
+		return fn.Fn(evalExpressions(cf.Args, env))
 	}
 	return val
 }
