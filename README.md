@@ -114,10 +114,11 @@ Gives: `20`.
 
 #####List builtin functions
 
-`head` - returns a first element in a list
-
+`head` - returns a first element in a list.
 Expression `(head (list 1 2 3))` will produce `1`.
 
-`tail` - returns all elements of a list except of first element
-
+`tail` - returns all elements of a list except of first element.
 Expression `(tail (list 1 2 3))` will produce `2 3`.
+
+`size` - returns a size of a list (count of elements).
+Expression `(size (list 1 2 3 4))` will produce `4`.
