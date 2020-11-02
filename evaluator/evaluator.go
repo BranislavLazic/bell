@@ -86,10 +86,12 @@ func evalExpression(exprType ast.Node, exprs []ast.Expression, env *object.Envir
 			case evalExpr.Type() == object.BooleanObj && accumResult.Type() == object.BooleanObj:
 				nextValue := evalExpr.(*object.Boolean)
 				accumResult = evalLogicalOperation(exprType, accumResult.(*object.Boolean), nextValue)
-			// If either evaluated expression or accumulation result is a string
-			// then perform string concatenation
+			// If either an evaluated expression or an accumulation result is a string
+			// then perform a string concatenation
 			case evalExpr.Type() == object.StringObj || accumResult.Type() == object.StringObj:
 				accumResult = evalStringOperation(exprType, accumResult, evalExpr)
+			case evalExpr.Type() == object.RuntimeErrorObj || accumResult.Type() == object.RuntimeErrorObj:
+				return evalExpr
 			default:
 				return &object.RuntimeError{
 					Error: fmt.Sprintf("Operation %s cannot be performed for types: %s and %s",

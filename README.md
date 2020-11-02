@@ -19,11 +19,24 @@ Reverse word:
 
 ```
 (let reverse [word]
-    if((> (size word) 0)
+    (if (> (size word) 0)
         (+ (reverse (tail word)) (head word))
         ""))
 
 (writeln (reverse "hello"))
+```
+
+Fold left implementation:
+
+```
+(let foldL [init lst func]
+    (if (not= nil lst)
+        (func (head lst) (foldL init (tail lst) func))
+        init))
+
+(writeln "Sum:" (foldL 0 (list 1 2 3 4 5) (let _ [a b] (+ a b))))
+
+(writeln "Product:" (foldL 1 (list 1 2 3 4 5) (let _ [a b] (* a b))))
 ```
 
 #### Arithmetic operators
