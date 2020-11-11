@@ -81,14 +81,13 @@ Feature: If expression
       4
       """
 
-  Scenario: It should evaluate to nil if "else" expression is missing and condition evaluates to false
+  Scenario: It should evaluate to nothing if "else" expression is missing and condition evaluates to false
     Given the program
       """
       (if (> 3 4)  4)
       """
     Then the result is
       """
-      nil
       """
 
   Scenario: It should not evaluate if condition is missing

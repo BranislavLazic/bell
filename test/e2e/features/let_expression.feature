@@ -41,6 +41,7 @@ Feature: Let expression
       """
 
 
+
   Scenario: It should evaluate to a function
     Given the program
       """
@@ -153,4 +154,26 @@ Feature: Let expression
     Then the result is
       """
       4
+      """
+
+  Scenario: It should not allow calling identifier with arguments
+    Given the program
+      """
+      (let x 3)
+      (x 6 2 7)
+      """
+    Then the result is
+      """
+      Identifiers do not take any arguments. Found 3.
+      """
+
+  Scenario: It should not allow expressions to follow without opening parentheses
+    Given the program
+      """
+      (let x [] if (> 2 1) 3))
+      (x)
+      """
+    Then the error is
+      """
+      Illegal use of operator 'if' at index 11.
       """

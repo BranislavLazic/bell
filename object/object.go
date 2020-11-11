@@ -15,6 +15,7 @@ const (
 	ListObj         = "LIST"
 	FunctionObj     = "FUNCTION"
 	NilObj          = "NIL"
+	NoopObj         = "NOOP"
 	BuiltinObj      = "BUILTIN"
 	RuntimeErrorObj = "RUNTIME_ERROR"
 )
@@ -111,6 +112,15 @@ func (n *Nil) Type() ObjectType {
 }
 func (n *Nil) Inspect() string {
 	return "nil"
+}
+
+type Noop struct{}
+
+func (n *Noop) Type() ObjectType {
+	return NoopObj
+}
+func (n *Noop) Inspect() string {
+	return ""
 }
 
 type BuiltinFunction func(args ...Object) Object

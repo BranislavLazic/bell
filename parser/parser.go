@@ -53,43 +53,83 @@ func (p *Parser) parseExpression() ast.Expression {
 	var expr ast.Expression
 	switch p.peekToken.Type {
 	case token.ADD:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.SUBTRACT:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.MULTIPLY:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.DIVIDE:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.MODULO:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
+	case token.POW:
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.EQUAL:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.NotEqual:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.AND:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.OR:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.NOT:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.GreaterThan:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.LessThan:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.GreaterThanEqual:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.LessThanEqual:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
 	case token.LET:
-		expr = p.parseLetExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseLetExpression()
+		})
 	case token.IF:
-		expr = p.parseIfExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseIfExpression()
+		})
 	case token.LIST:
-		expr = p.parseOperationExpression()
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOperationExpression()
+		})
+	case token.WRITELN:
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseWriteLnExpression()
+		})
 	case token.STRING:
 		expr = p.parseStringLiteral()
-	case token.WRITELN:
-		expr = p.parseWriteLnExpression()
 	case token.NIL:
 		expr = p.parseNil()
 	case token.IDENT:
@@ -121,7 +161,6 @@ func (p *Parser) parseExpression() ast.Expression {
 
 // Parse arithmetic, relational, logic operations and list
 func (p *Parser) parseOperationExpression() ast.Expression {
-	p.nextToken()
 	tok := p.curToken
 	var exprs []ast.Expression
 	leadingExpr := p.parseExpression()
@@ -170,6 +209,8 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 		expr = &ast.DivideExpression{Token: tok, Exprs: exprs}
 	case token.MODULO:
 		expr = &ast.ModuloExpression{Token: tok, Exprs: exprs}
+	case token.POW:
+		expr = &ast.PowExpression{Token: tok, Exprs: exprs}
 	case token.EQUAL:
 		expr = &ast.EqualExpression{Token: tok, Exprs: exprs}
 	case token.NotEqual:
@@ -193,7 +234,6 @@ func (p *Parser) parseOperationExpression() ast.Expression {
 }
 
 func (p *Parser) parseLetExpression() ast.Expression {
-	p.nextToken()
 	letTok := p.curToken
 	if p.peekToken.Type != token.IDENT {
 		p.Errors = append(p.Errors, "'let' should be followed by an identifier.")
@@ -233,7 +273,6 @@ func (p *Parser) parseLetExpression() ast.Expression {
 }
 
 func (p *Parser) parseIfExpression() ast.Expression {
-	p.nextToken()
 	ifTok := p.curToken
 	cond := p.parseExpression()
 	if cond == nil {
@@ -263,7 +302,6 @@ func (p *Parser) parseIfExpression() ast.Expression {
 }
 
 func (p *Parser) parseWriteLnExpression() *ast.WriteLnExpression {
-	p.nextToken()
 	writelnTok := p.curToken
 	exprs, ok := p.collectExpressions()
 	if !ok {
@@ -400,4 +438,24 @@ func (p *Parser) isPeekEndExpression() bool {
 		}
 	}
 	return true
+}
+
+func (p *Parser) isCurrStartExpression() bool {
+	if p.curToken.Type != token.StartExpression {
+		p.Errors = append(
+			p.Errors,
+			fmt.Sprintf("Illegal character '%s' found at index %d. Expecting '('.", p.peekToken.Literal, p.lxr.Position-1),
+		)
+		return false
+	}
+	return true
+}
+
+func (p *Parser) ensureStartExpression(fn func() ast.Expression) ast.Expression {
+	ok := p.isCurrStartExpression()
+	p.nextToken()
+	if !ok {
+		return nil
+	}
+	return fn()
 }

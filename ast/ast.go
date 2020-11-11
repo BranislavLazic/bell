@@ -139,6 +139,18 @@ func (me *ModuloExpression) String() string {
 	return fmt.Sprintf("(%% %s)", concatExprsAsString(me.Exprs))
 }
 
+type PowExpression struct {
+	Token token.Token // Pow operator
+	Exprs []Expression
+}
+
+func (pe *PowExpression) TokenLiteral() string {
+	return pe.Token.Literal
+}
+func (pe *PowExpression) String() string {
+	return fmt.Sprintf("(^ %s)", concatExprsAsString(pe.Exprs))
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64

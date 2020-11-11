@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+
 	"github.com/branislavlazic/bell/object"
 )
 

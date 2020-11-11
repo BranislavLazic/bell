@@ -39,6 +39,19 @@ Fold left implementation:
 (writeln "Product:" (foldL 1 (list 1 2 3 4 5) (let _ [a b] (* a b))))
 ```
 
+Map implementation with invocation which takes a function
+that multiplies list members with 2:
+
+```
+(let map [lst func]
+    (if (not= nil lst)
+    (list ((func (head lst)) (map (tail lst) func)))))
+
+(let lst (list 1 2 3 5 6))
+
+(writeln (map lst (let _ [x] (* x 2))))
+```
+
 #### Arithmetic operators
 
 | Operator | Description                                                   | Example                      |
@@ -48,6 +61,7 @@ Fold left implementation:
 |   `*`    | Multiplies expressions                                        | (\* 3 4) will evaluate to 12 |
 |   `/`    | Divides expressions                                           | (/ 6 2) will evaluate to 3   |
 |   `%`    | Modulo division (produces a remainder of an integer division) | (% 6 2) will evaluate to 0   |
+|   `^`    | Value raised to the power of the second argument              | (^ 2 3) will evaluate to 8   |
 
 #### Relational operators
 

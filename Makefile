@@ -1,6 +1,6 @@
 APP=bell
 MODULE := github.com/branislavlazic/bell
-VERSION := v0.1-alpha
+VERSION := v0.1-alpha.1
 
 .PHONY: clean binaries test
 

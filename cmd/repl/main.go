@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/branislavlazic/bell/evaluator"
 	"github.com/branislavlazic/bell/lexer"
 	"github.com/branislavlazic/bell/object"
 	"github.com/branislavlazic/bell/parser"
+	"github.com/charmbracelet/bubbles/textinput"
 	input "github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	te "github.com/muesli/termenv"
-	"log"
 )
 
 const textPrompt = ">> "
@@ -40,7 +42,7 @@ func initialModel() model {
 }
 
 func (m model) Init() tea.Cmd {
-	return input.Blink(m.textInput)
+	return textinput.Blink
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -72,7 +74,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
-	m.textInput, cmd = input.Update(msg, m.textInput)
+	m.textInput, cmd = m.textInput.Update(msg)
 	return m, cmd
 }
 
@@ -81,7 +83,7 @@ func (m model) View() string {
 	output := fmt.Sprintf(
 		"%s\n%s\n",
 		m.result,
-		input.View(m.textInput),
+		m.textInput.View(),
 	)
 	return te.String(output).Foreground(color(outputForegroundColor)).String()
 }

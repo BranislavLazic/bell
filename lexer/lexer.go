@@ -31,6 +31,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.DIVIDE, l.ch)
 	case '%':
 		tok = newToken(token.MODULO, l.ch)
+	case '^':
+		tok = newToken(token.POW, l.ch)
 	case '=':
 		tok = newToken(token.EQUAL, l.ch)
 	case '>':

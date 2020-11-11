@@ -30,6 +30,7 @@ const (
 	MULTIPLY         = "MULTIPLY"
 	DIVIDE           = "DIVIDE"
 	MODULO           = "MODULO"
+	POW              = "POW"
 	EQUAL            = "EQUAL"
 	NotEqual         = "NOT_EQUAL"
 	NOT              = "NOT"
@@ -68,4 +69,5 @@ var OperatorLiterals = []string{
 	"=", "not=", "and",
 	"or", ">", ">=",
 	"<", "<=", "not",
-	"list", "if", "writeln"}
+	"list", "if", "writeln",
+	"^"}

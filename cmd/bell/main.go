@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/branislavlazic/bell/evaluator"
-	"github.com/branislavlazic/bell/lexer"
-	"github.com/branislavlazic/bell/object"
-	"github.com/branislavlazic/bell/parser"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/branislavlazic/bell/evaluator"
+	"github.com/branislavlazic/bell/lexer"
+	"github.com/branislavlazic/bell/object"
+	"github.com/branislavlazic/bell/parser"
 )
 
-func LoadBellFile(fileName string) ([]byte, error) {
+func loadBellFile(fileName string) ([]byte, error) {
 	if !strings.HasSuffix(fileName, ".bell") {
 		log.Fatalf("Invalid file name. extension must be bell.")
 	}
@@ -23,7 +24,7 @@ func main() {
 	if len(os.Args) != 2 {
 		log.Fatalf("Provide a source code file with .bell extension")
 	}
-	file, err := LoadBellFile(os.Args[1])
+	file, err := loadBellFile(os.Args[1])
 	if err != nil {
 		log.Fatalf("Cannot read a file.")
 	}

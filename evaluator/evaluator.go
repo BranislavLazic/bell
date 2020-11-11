@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/branislavlazic/bell/ast"
 	"github.com/branislavlazic/bell/object"
@@ -22,6 +23,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.DivideExpression:
 		return evalExpression(node, node.Exprs, env)
 	case *ast.ModuloExpression:
+		return evalExpression(node, node.Exprs, env)
+	case *ast.PowExpression:
 		return evalExpression(node, node.Exprs, env)
 	case *ast.EqualExpression:
 		return evalEqualForAll(node, node.Exprs, env)
@@ -118,6 +121,8 @@ func evalArithmeticOperation(exprType ast.Node, left *object.Integer, right *obj
 		return &object.Integer{Value: left.Value / right.Value}
 	case *ast.ModuloExpression:
 		return &object.Integer{Value: left.Value % right.Value}
+	case *ast.PowExpression:
+		return &object.Integer{Value: int64(math.Pow(float64(left.Value), float64(right.Value)))}
 	case *ast.EqualExpression:
 		return &object.Boolean{Value: left.Value == right.Value}
 	case *ast.NotEqualExpression:
@@ -293,10 +298,10 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 	if !ok && !isBuiltin {
 		return &object.RuntimeError{Error: fmt.Sprintf("Function %s is undefined", fnName)}
 	}
+	argsCount := len(cf.Args)
 	switch fn := val.(type) {
 	case *object.Function:
 		paramsCount := len(fn.Params)
-		argsCount := len(cf.Args)
 		if argsCount > paramsCount {
 			return &object.RuntimeError{
 				Error: fmt.Sprintf("Too many arguments. Expected %d, got %d.", paramsCount, argsCount),
@@ -314,8 +319,14 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 		return evalExpressions(fn.Body, innerEnv)
 	case *object.Builtin:
 		return fn.Fn(evalExpressions(cf.Args, env))
+	default:
+		if argsCount > 0 {
+			return &object.RuntimeError{
+				Error: fmt.Sprintf("Identifiers do not take any arguments. Found %d.", argsCount),
+			}
+		}
+		return val
 	}
-	return val
 }
 
 func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.Object {
@@ -329,7 +340,9 @@ func evalIfExpression(ifExpr *ast.IfExpression, env *object.Environment) object.
 		if ifExpr.ElseExpr != nil && !cnd.Value {
 			return Eval(ifExpr.ElseExpr, env)
 		}
-		return &object.Nil{}
+		// If a condition is not satisfied and an else expression is missing,
+		// return a Noop object which doesn't contain anything.
+		return &object.Noop{}
 	}
 	return &object.RuntimeError{
 		Error: fmt.Sprintf("Condition for if expression should evaluate to BOOLEAN type. Found %s type.", cond.Type()),
