@@ -128,6 +128,10 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.ensureStartExpression(func() ast.Expression {
 			return p.parseWriteLnExpression()
 		})
+	case token.OPEN:
+		expr = p.ensureStartExpression(func() ast.Expression {
+			return p.parseOpenExpression()
+		})
 	case token.STRING:
 		expr = p.parseStringLiteral()
 	case token.NIL:
@@ -311,6 +315,14 @@ func (p *Parser) parseWriteLnExpression() *ast.WriteLnExpression {
 	return &ast.WriteLnExpression{Token: writelnTok, Exprs: exprs}
 }
 
+func (p *Parser) parseOpenExpression() *ast.OpenExpression {
+	openTok := p.curToken
+	expr := p.parseStringLiteral()
+	p.nextToken()
+	p.nextToken()
+	return &ast.OpenExpression{Token: openTok, Expr: expr}
+}
+
 func (p *Parser) parseParams() ([]*ast.Identifier, bool) {
 	var params []*ast.Identifier
 	p.nextToken()
@@ -376,6 +388,10 @@ func (p *Parser) parseBoolLiteral() *ast.BooleanLiteral {
 
 func (p *Parser) parseStringLiteral() *ast.StringLiteral {
 	p.nextToken()
+	if p.curToken.Type != token.STRING {
+		p.Errors = append(p.Errors, "Not a string.")
+		return nil
+	}
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 }
 

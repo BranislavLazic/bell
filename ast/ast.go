@@ -356,6 +356,18 @@ func (wle *WriteLnExpression) String() string {
 	return fmt.Sprintf("(writeln %s)", concatExprsAsString(wle.Exprs))
 }
 
+type OpenExpression struct {
+	Token token.Token // open keyword
+	Expr  Expression  // string
+}
+
+func (oe *OpenExpression) TokenLiteral() string {
+	return oe.Token.Literal
+}
+func (oe *OpenExpression) String() string {
+	return fmt.Sprintf("(open %s)", oe.Expr)
+}
+
 type NilExpression struct {
 	Token token.Token // nil keyword
 }

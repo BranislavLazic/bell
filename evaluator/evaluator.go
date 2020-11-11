@@ -2,7 +2,11 @@ package evaluator
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math"
+
+	"github.com/branislavlazic/bell/lexer"
+	"github.com/branislavlazic/bell/parser"
 
 	"github.com/branislavlazic/bell/ast"
 	"github.com/branislavlazic/bell/object"
@@ -60,6 +64,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalCallFunctionExpression(node, env)
 	case *ast.WriteLnExpression:
 		return evalWriteLnExpression(node, env)
+	case *ast.OpenExpression:
+		return evalOpenExpression(node, env)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
@@ -375,10 +381,38 @@ func evalWriteLnExpression(writeLnExpr *ast.WriteLnExpression, env *object.Envir
 	return &object.Nil{}
 }
 
+func evalOpenExpression(openExpr *ast.OpenExpression, env *object.Environment) object.Object {
+	file := openExpr.Expr.String()
+	arr, err := ioutil.ReadFile(file + ".bell")
+	if err != nil {
+		return &object.RuntimeError{
+			Error: fmt.Sprintf("Cannot open '%s'. File not found.", file),
+		}
+	}
+	lxr := lexer.New(string(arr))
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+	if len(p.Errors) > 0 {
+		for _, err := range p.Errors {
+			return &object.RuntimeError{
+				Error: err,
+			}
+		}
+	} else {
+		Eval(program, env)
+	}
+	return &object.Noop{}
+}
+
 func evalExpressions(exprs []ast.Expression, env *object.Environment) object.Object {
 	var result object.Object
 	for _, expr := range exprs {
 		result = Eval(expr, env)
+		switch result.(type) {
+		case *object.RuntimeError:
+			SysOut = append(SysOut, result)
+			return result
+		}
 	}
 	return result
 }

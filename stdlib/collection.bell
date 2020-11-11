@@ -1,0 +1,9 @@
+(let foldL [init lst func]
+    (if (not= nil lst)
+        (func (head lst) (foldL init (tail lst) func))
+        init))
+
+        
+(let map [lst func]
+    (if (not= nil lst)
+    (list ((func (head lst)) (map (tail lst) func)))))

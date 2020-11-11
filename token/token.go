@@ -17,6 +17,7 @@ const (
 	LIST            = "LIST"
 	STRING          = "STRING"
 	WRITELN         = "WRITELN"
+	OPEN            = "OPEN"
 	IDENT           = "IDENT"
 	NIL             = "NIL"
 	StartParamList  = "START_PARAM_LIST"
@@ -53,6 +54,7 @@ var keywords = map[string]TokType{
 	"if":      IF,
 	"list":    LIST,
 	"writeln": WRITELN,
+	"open":    OPEN,
 	"nil":     NIL,
 }
 
@@ -70,4 +72,4 @@ var OperatorLiterals = []string{
 	"or", ">", ">=",
 	"<", "<=", "not",
 	"list", "if", "writeln",
-	"^"}
+	"^", "open"}

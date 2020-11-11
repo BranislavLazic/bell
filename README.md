@@ -170,3 +170,11 @@ Expression `(tail "hello")` will produce `ello`.
 Expression `(size (list 1 2 3 4))` will produce `4`.
 
 Expression `(size "hello")` will produce `5`.
+
+#### Open files
+
+Use `open` to import variables and functions from another file relative to bell executable file.
+
+```
+(open "stdlib/collection")
+```
