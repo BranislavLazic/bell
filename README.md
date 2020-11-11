@@ -20,8 +20,7 @@ Reverse word:
 ```
 (let reverse [word]
     (if (> (size word) 0)
-        (+ (reverse (tail word)) (head word))
-        ""))
+        (+ (reverse (tail word)) (head word))))
 
 (writeln (reverse "hello"))
 ```
