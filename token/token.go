@@ -16,7 +16,6 @@ const (
 	IF              = "IF"
 	LIST            = "LIST"
 	STRING          = "STRING"
-	WRITELN         = "WRITELN"
 	OPEN            = "OPEN"
 	IDENT           = "IDENT"
 	NIL             = "NIL"
@@ -44,18 +43,17 @@ const (
 )
 
 var keywords = map[string]TokType{
-	"true":    BOOL,
-	"false":   BOOL,
-	"and":     AND,
-	"or":      OR,
-	"not":     NOT,
-	"not=":    NotEqual,
-	"let":     LET,
-	"if":      IF,
-	"list":    LIST,
-	"writeln": WRITELN,
-	"open":    OPEN,
-	"nil":     NIL,
+	"true":  BOOL,
+	"false": BOOL,
+	"and":   AND,
+	"or":    OR,
+	"not":   NOT,
+	"not=":  NotEqual,
+	"let":   LET,
+	"if":    IF,
+	"list":  LIST,
+	"open":  OPEN,
+	"nil":   NIL,
 }
 
 func LookupKeyword(instruction string) TokType {
@@ -71,5 +69,5 @@ var OperatorLiterals = []string{
 	"=", "not=", "and",
 	"or", ">", ">=",
 	"<", "<=", "not",
-	"list", "if", "writeln",
+	"list", "if",
 	"^", "open"}

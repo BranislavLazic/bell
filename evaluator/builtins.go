@@ -73,4 +73,20 @@ var builtins = map[string]*object.Builtin{
 			}
 		},
 	},
+	"write": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Print(arg.Inspect())
+			}
+			return &object.Nil{}
+		},
+	},
+	"writeln": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+			return &object.Nil{}
+		},
+	},
 }

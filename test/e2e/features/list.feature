@@ -46,7 +46,7 @@ Feature: List evaluation
       """
     Then the result is
       """
-      Function is not applicable for INTEGER type.
+      Insufficient number of arguments. Expected 1, got 2.
       """
 
   Scenario: It should be able to override builtin 'head' function

@@ -55,7 +55,7 @@ func (s *String) Type() ObjectType {
 	return StringObj
 }
 func (s *String) Inspect() string {
-	return fmt.Sprintf("%s", s.Value)
+	return s.Value
 }
 
 type List struct {

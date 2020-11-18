@@ -12,8 +12,6 @@ import (
 	"github.com/branislavlazic/bell/object"
 )
 
-var SysOut []object.Object
-
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -62,8 +60,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalFunctionExpression(node, env)
 	case *ast.CallFunction:
 		return evalCallFunctionExpression(node, env)
-	case *ast.WriteLnExpression:
-		return evalWriteLnExpression(node, env)
 	case *ast.OpenExpression:
 		return evalOpenExpression(node, env)
 	case *ast.IntegerLiteral:
@@ -324,7 +320,11 @@ func evalCallFunctionExpression(cf *ast.CallFunction, env *object.Environment) o
 		}
 		return evalExpressions(fn.Body, innerEnv)
 	case *object.Builtin:
-		return fn.Fn(evalExpressions(cf.Args, env))
+		var args []object.Object
+		for _, a := range cf.Args {
+			args = append(args, Eval(a, env))
+		}
+		return fn.Fn(args...)
 	default:
 		if argsCount > 0 {
 			return &object.RuntimeError{
@@ -372,15 +372,6 @@ func evalIdentifier(ident *ast.Identifier, env *object.Environment) object.Objec
 	return val
 }
 
-func evalWriteLnExpression(writeLnExpr *ast.WriteLnExpression, env *object.Environment) object.Object {
-	var evaluatedExpr object.Object
-	for _, expr := range writeLnExpr.Exprs {
-		evaluatedExpr = Eval(expr, env)
-		SysOut = append(SysOut, evaluatedExpr)
-	}
-	return &object.Nil{}
-}
-
 func evalOpenExpression(openExpr *ast.OpenExpression, env *object.Environment) object.Object {
 	file := openExpr.Expr.String()
 	arr, err := ioutil.ReadFile(file + ".bell")
@@ -410,7 +401,7 @@ func evalExpressions(exprs []ast.Expression, env *object.Environment) object.Obj
 		result = Eval(expr, env)
 		switch result.(type) {
 		case *object.RuntimeError:
-			SysOut = append(SysOut, result)
+			fmt.Println(result.Inspect())
 			return result
 		}
 	}

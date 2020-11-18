@@ -38,8 +38,5 @@ func main() {
 		}
 	} else {
 		evaluator.Eval(program, env)
-		for _, obj := range evaluator.SysOut {
-			fmt.Println(obj.Inspect())
-		}
 	}
 }

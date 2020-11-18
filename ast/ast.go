@@ -344,18 +344,6 @@ func (cf *CallFunction) String() string {
 	return fmt.Sprintf("(%s %s)", cf.Identifier.String(), argsStr)
 }
 
-type WriteLnExpression struct {
-	Token token.Token // writeln keyword
-	Exprs []Expression
-}
-
-func (wle *WriteLnExpression) TokenLiteral() string {
-	return wle.Token.Literal
-}
-func (wle *WriteLnExpression) String() string {
-	return fmt.Sprintf("(writeln %s)", concatExprsAsString(wle.Exprs))
-}
-
 type OpenExpression struct {
 	Token token.Token // open keyword
 	Expr  Expression  // string

@@ -130,14 +130,16 @@ func (l *Lexer) readIdentifier() string {
 }
 
 func (l *Lexer) readString() string {
-	position := l.Position + 1
+	var accumulator string
 	for {
 		l.readChar()
 		if l.ch == '"' || l.ch == 0 {
 			break
 		}
+		str := l.withBreakLineCheck()
+		accumulator = accumulator + str
 	}
-	return l.input[position:l.Position]
+	return accumulator
 }
 
 func (l *Lexer) skipWhitespace() {
@@ -164,3 +166,15 @@ func newToken(tokenType token.TokType, ch byte) token.Token {
 		Literal: string(ch),
 	}
 }
+
+func (l *Lexer) withBreakLineCheck() string {
+	if l.ch == '\\' {
+		if value, ok := breakLineChars[l.peekChar()]; ok {
+			l.readChar()
+			return value
+		}
+	}
+	return string(l.ch)
+}
+
+var breakLineChars = map[byte]string{'n': "\n", 't': "\t", 'r': "\r"}

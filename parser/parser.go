@@ -124,10 +124,6 @@ func (p *Parser) parseExpression() ast.Expression {
 		expr = p.ensureStartExpression(func() ast.Expression {
 			return p.parseOperationExpression()
 		})
-	case token.WRITELN:
-		expr = p.ensureStartExpression(func() ast.Expression {
-			return p.parseWriteLnExpression()
-		})
 	case token.OPEN:
 		expr = p.ensureStartExpression(func() ast.Expression {
 			return p.parseOpenExpression()
@@ -305,16 +301,6 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	return &ast.IfExpression{Token: ifTok, Condition: cond, ThenExpr: expr, ElseExpr: elseExpr}
 }
 
-func (p *Parser) parseWriteLnExpression() *ast.WriteLnExpression {
-	writelnTok := p.curToken
-	exprs, ok := p.collectExpressions()
-	if !ok {
-		return nil
-	}
-	p.nextToken()
-	return &ast.WriteLnExpression{Token: writelnTok, Exprs: exprs}
-}
-
 func (p *Parser) parseOpenExpression() *ast.OpenExpression {
 	openTok := p.curToken
 	expr := p.parseStringLiteral()
@@ -467,6 +453,10 @@ func (p *Parser) isCurrStartExpression() bool {
 	return true
 }
 
+// Cases like (+ 3 if (> 3 4) 3 4)) will pass because 'if'
+// is a valid token, but it's a syntactically incorrect expression (lacks '(' before 'if').
+// Use this function to ensure that an expression starts with '(' in
+// order to avoid cases like above.
 func (p *Parser) ensureStartExpression(fn func() ast.Expression) ast.Expression {
 	ok := p.isCurrStartExpression()
 	p.nextToken()

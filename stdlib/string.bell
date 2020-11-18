@@ -1,0 +1,11 @@
+(let reverse [str]
+    (if (> (size str) 0)
+        (+ (reverse (tail str)) (head str))))
+
+(let charAtIndex [index str]
+    (charCounter index 0 str))
+
+(let charCounter [index from str]
+    (if (= index from)
+        (head str)
+        (charCounter index (+ from 1) (tail str))))
